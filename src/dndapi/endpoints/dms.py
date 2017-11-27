@@ -32,16 +32,17 @@ def validate_dms_post(js):
 @jwt_required()
 def get_currentdm():
     s = Session()
-    currentdm = s.query(Dm).\
-        filter(Dm.state == 'current').\
-        one_or_none()
-    if currentdm:
-        res = to_json(currentdm)
+    try:
+        currentdm = s.query(Dm).\
+            filter(Dm.state == 'current').\
+            one_or_none()
+        if currentdm:
+            res = to_json(currentdm)
+            return to_json(currentdm), 200
+        else:
+            return '', 404
+    finally:
         s.close()
-        return to_json(currentdm), 200
-    else:
-        s.close()
-        return '', 404
 
 
 @app.route('/dms/', methods=['POST',])
@@ -62,18 +63,15 @@ def post_dm():
                 state = 'current')
         s = Session()
         # change previous current dm to not being it
-        s.query(Dm).\
-            filter(Dm.state == 'current').\
-            update({Dm.state: None})
-        s.add(new_dm)
         try:
+            s.query(Dm).\
+                filter(Dm.state == 'current').\
+                update({Dm.state: None})
+            s.add(new_dm)
             s.commit()
             s.flush()
-            returntext = '{"result": "ok"}'
-            returnval = 201
+            return '{"result": "ok"}', 201
         except:
-            returnval = 400
-            returntext = ''
+            return '', 400
         finally:
             s.close()
-        return returntext,returnval

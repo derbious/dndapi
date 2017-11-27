@@ -46,34 +46,34 @@ def get_donations(donation_id=None):
         # get a specific donor. return its json
         if donation_id:
             s = Session()
-            donation = s.query(Donation).filter(Donation.id==donation_id).one_or_none()
-            if donation:
-                donation_json = to_json(donation)
+            try:
+                donation = s.query(Donation).filter(Donation.id==donation_id).one_or_none()
+                if donation:
+                    donation_json = to_json(donation)
+                    return donation_json
+                else:
+                    return '', 404
+            finally:
                 s.close()
-                return donation_json
-            else:
-                s.close()
-                return '', 404
         else:
             # Look for donations with a query string ?donor_id=2
             args = request.args
             if 'donor_id' in args:
                 donor_id = args['donor_id']
                 s = Session()
-                search_results = s.query(Donation).filter(Donation.donor_id==donor_id).all();
-                if search_results == None:
+                try:
+                    search_results = s.query(Donation).filter(Donation.donor_id==donor_id).all();
+                    if search_results == None:
+                        return '[]', 200
+                    else:
+                        ret = "[%s]"%','.join([to_json(x) for x in search_results])
+                        return ret, 200
+                finally:
                     s.close()
-                    return '[]', 200
-                else:
-                    ret = "[%s]"%','.join([to_json(x) for x in search_results])
-                    s.close()
-                    return ret
             else:
                 return '',404
-            return '',404
     elif request.method == 'POST':
         # pull the posted information from json and validate it
-        app.logger.info("method was post")
         json_data = request.get_json()
         if not json_data or not validate_donation_post(json_data):
             app.logger.info("shit was bad %s", json_data)
@@ -87,8 +87,9 @@ def get_donations(donation_id=None):
                     reason=json_data['reason'],
                     donor_id=json_data['donor_id'])
             s = Session()
-            s.add(new_donation)
-            #TODO check for failure
-            s.commit()
-            s.close()
-            return "{\"status\": \"ok\"}",201
+            try:
+                s.add(new_donation)
+                s.commit()
+                return "{\"status\": \"ok\"}",201
+            finally:
+                s.close()

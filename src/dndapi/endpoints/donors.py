@@ -41,14 +41,15 @@ def get_donors(donor_id=None):
         # get a specific donor. return its json
         if donor_id:
             s = Session()
-            donor = s.query(Donor).filter(Donor.id==donor_id).one_or_none()
-            if donor:
-                donor_json = to_json(donor)
+            try:
+                donor = s.query(Donor).filter(Donor.id==donor_id).one_or_none()
+                if donor:
+                    donor_json = to_json(donor)
+                    return donor_json
+                else:
+                    return '', 404
+            finally:
                 s.close()
-                return donor_json
-            else:
-                s.close()
-                return '', 404
         else:
             return '',404
     elif request.method == 'POST':
@@ -66,15 +67,12 @@ def get_donors(donor_id=None):
                     physical_address=json_data['address'],
                     dci_number=json_data.get('dci', None))
             s = Session()
-            s.add(new_donor)
             try:
+                s.add(new_donor)
                 s.commit()
                 s.flush()
-                returntext = "{\"donor_id\": %s}"%new_donor.id
-                returnval = 201
+                return "{\"donor_id\": %s}"%new_donor.id, 201
             except:
-                returnval = 400
-                returntext = ''
+                return '', 400
             finally:
                 s.close()
-            return returntext,returnval

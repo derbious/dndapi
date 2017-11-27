@@ -18,14 +18,15 @@ def search():
         q = args['q']
         result_array = []
         s = Session()
-        like_str = '%{}%'.format(q)
-        result_array = result_array + s.query(Donor).filter(or_(Donor.first_name.like(like_str), Donor.last_name.like(like_str), Donor.email_address.like(like_str))).all()
-        if result_array == None:
+        try:
+            like_str = '%{}%'.format(q)
+            result_array = result_array + s.query(Donor).filter(or_(Donor.first_name.like(like_str), Donor.last_name.like(like_str), Donor.email_address.like(like_str))).all()
+            if result_array == None:
+                return '[]', 200
+            else:
+                ret = "[%s]"%','.join([to_json(x) for x in result_array])
+                return ret
+        finally:
             s.close()
-            return '[]', 200
-        else:
-            ret = "[%s]"%','.join([to_json(x) for x in result_array])
-            s.close()
-            return ret
     else:
         return '', 200

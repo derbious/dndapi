@@ -98,31 +98,32 @@ def get_characters(character_id=None):
         # get a specific character. return its json
         if character_id:
             s = Session()
-            character = s.query(Character).filter(Character.id==character_id).one_or_none()
-            if character:
-                character_json = to_json(character)
+            try:
+                character = s.query(Character).filter(Character.id==character_id).one_or_none()
+                if character:
+                    character_json = to_json(character)
+                    return character_json 
+                else:
+                    return '', 404
+            finally:
                 s.close()
-                return character_json 
-            else:
-                s.close()
-                return '', 404
         else:
             # Look for characters with a query string ?donor_id=2
             args = request.args
             if 'donor_id' in args:
                 donor_id = args['donor_id']
                 s = Session()
-                search_results = s.query(Character).filter(Character.donor_id==donor_id).all();
-                if search_results == None:
+                try:
+                    search_results = s.query(Character).filter(Character.donor_id==donor_id).all();
+                    if search_results == None:
+                        return '[]', 200
+                    else:
+                        ret = "[%s]"%','.join([to_json(x) for x in search_results])
+                        return ret
+                finally:
                     s.close()
-                    return '[]', 200
-                else:
-                    ret = "[%s]"%','.join([to_json(x) for x in search_results])
-                    s.close()
-                    return ret
             else:
                 return '',404
-            return '',404
     elif request.method == 'POST':
         # pull the posted information from json and validate it
         json_data = request.get_json()
@@ -147,20 +148,22 @@ def get_characters(character_id=None):
             
             #Grab the maximum queue_pos, and set it
             s = Session()
-            pos_max = s.query(func.max(Character.queue_pos)).filter(Character.state == 'waiting').one_or_none()
-            app.logger.info(pos_max)
+            try:
+                pos_max = s.query(func.max(Character.queue_pos)).filter(Character.state == 'waiting').one_or_none()
+                app.logger.info(pos_max)
 
-            if not pos_max[0]:
-                new_pos=1
-            else:
-                new_pos = pos_max[0]+1
-            new_character.queue_pos = new_pos
+                if not pos_max[0]:
+                    new_pos=1
+                else:
+                    new_pos = pos_max[0]+1
+                new_character.queue_pos = new_pos
 
-            s.add(new_character)
-            s.add(new_donation)
-            s.commit()
-            s.close()
-            return "{\"status\": \"ok\"}",201
+                s.add(new_character)
+                s.add(new_donation)
+                s.commit()
+                return "{\"status\": \"ok\"}",201
+            finally:
+                s.close()
 
 
 
@@ -180,36 +183,36 @@ def rollinitiative(character_id=None):
         if not json_data or not validate_startplay_post(json_data):
             return '', 400
         s = Session()
-        char = s.query(Character).\
-            filter(Character.id == character_id).\
-            one_or_none()
-
-        if not char:
-            return '',400
-        # Changes state of character to -playing-
-        char.state = 'playing'
-
-        # needed for the math in the UPDATE
-        current_queue_pos = char.queue_pos
-
-        # sets the queue_pos to the negative of their seat number
-        char.queue_pos = json_data['seat_num'] * -1
-        # starts clock
-        char.starttime = datetime.now()
-
-        ##subtract 1 from  everything above current_queue_pos
-        s.query(Character).\
-            filter(Character.state == 'waiting').\
-            filter(Character.queue_pos > current_queue_pos).\
-            update({Character.queue_pos: Character.queue_pos - 1})
-
         try:
+            char = s.query(Character).\
+                filter(Character.id == character_id).\
+                one_or_none()
+
+            if not char:
+                return '',400
+            # Changes state of character to -playing-
+            char.state = 'playing'
+
+            # needed for the math in the UPDATE
+            current_queue_pos = char.queue_pos
+
+            # sets the queue_pos to the negative of their seat number
+            char.queue_pos = json_data['seat_num'] * -1
+            # starts clock
+            char.starttime = datetime.now()
+
+            ##subtract 1 from  everything above current_queue_pos
+            s.query(Character).\
+                filter(Character.state == 'waiting').\
+                filter(Character.queue_pos > current_queue_pos).\
+                update({Character.queue_pos: Character.queue_pos - 1})
+
             s.commit()
+            return '{"status": "ok"}',201
         except:
             return '',400
         finally:
             s.close()
-        return '{"status": "ok"}',201
 
 
 #The /characters/death endpoint removes the character from play
@@ -223,25 +226,25 @@ def characterdeath(character_id=None):
         return '',400
     else:
         s = Session()
-        char = s.query(Character).\
-            filter(Character.id == character_id).\
-            first()
-        dm = s.query(Dm).\
-            filter(Dm.state == 'current').\
-            first()
-        if not char:
-            return '', 400
-        char.state = 'dead'
-        char.deathtime = datetime.now()
-        char.queue_pos = None
-        dm.num_kills += 1
         try:
+            char = s.query(Character).\
+                filter(Character.id == character_id).\
+                first()
+            dm = s.query(Dm).\
+                filter(Dm.state == 'current').\
+                first()
+            if not char:
+                return '', 400
+            char.state = 'dead'
+            char.deathtime = datetime.now()
+            char.queue_pos = None
+            dm.num_kills += 1
             s.commit()
+            return "{\"status\": \"ok\"}",201
         except:
             return '',400
         finally:
             s.close()
-        return "{\"status\": \"ok\"}",201
 
 
 # the /characters/res/ endpoint ressurects the player (optional cash
@@ -261,33 +264,33 @@ def characterres(character_id=None):
         if not json_data or not validate_res_post(json_data):
             return '', 400
         s = Session()
-        char = s.query(Character).\
-            filter(Character.id == character_id).\
-            first()
-        dm = s.query(Dm).\
-            filter(Dm.state == 'current').\
-            first()
-        if not char:
-            return '', 400
-
-        # add res
-        char.num_resses = char.num_resses+1
-        dm.num_kills += 1
-        if json_data['donation'] != None:
-            new_donation = Donation(
-                timestamp = datetime.now(),
-                amount = json_data['donation']['amt'],
-                method = json_data['donation']['method'],
-                reason = 'player_res',
-                donor_id = char.donor_id)
-            s.add(new_donation)
         try:
+            char = s.query(Character).\
+                filter(Character.id == character_id).\
+                first()
+            dm = s.query(Dm).\
+                filter(Dm.state == 'current').\
+                first()
+            if not char:
+                return '', 400
+
+            # add res
+            char.num_resses = char.num_resses+1
+            dm.num_kills += 1
+            if json_data['donation'] != None:
+                new_donation = Donation(
+                    timestamp = datetime.now(),
+                    amount = json_data['donation']['amt'],
+                    method = json_data['donation']['method'],
+                    reason = 'player_res',
+                    donor_id = char.donor_id)
+                s.add(new_donation)
             s.commit()
+            return "{\"status\": \"ok\"}",201
         except:
             return '',400
         finally:
             s.close()
-        return "{\"status\": \"ok\"}",201
 
 #/characters/graveyard/ endpoint. returns current deaths ranked by
 # time alive
@@ -295,19 +298,21 @@ def characterres(character_id=None):
 @jwt_required()
 def graveyard():
     s = Session()
-    deadchars = s.query(Character,Donor).\
-        filter(Character.state == 'dead').\
-        join(Donor).\
-        all()
-    if not deadchars:
-        return '[]', 200
-    jso = []
-    for char in deadchars:
-        jso.append({
-            'name': char.Character.name,
-            'player': char.Donor.first_name,
-            'seconds_alive': (char.Character.deathtime - char.Character.starttime).total_seconds()
-        })
-        retjson = json.dumps(sorted(jso, key=lambda k: k['seconds_alive'], reverse=True))
-    s.close()
-    return retjson,200
+    try:
+        deadchars = s.query(Character,Donor).\
+            filter(Character.state == 'dead').\
+            join(Donor).\
+            all()
+        if not deadchars:
+            return '[]', 200
+        jso = []
+        for char in deadchars:
+            jso.append({
+                'name': char.Character.name,
+                'player': char.Donor.first_name,
+                'seconds_alive': (char.Character.deathtime - char.Character.starttime).total_seconds()
+            })
+            retjson = json.dumps(sorted(jso, key=lambda k: k['seconds_alive'], reverse=True))
+        return retjson,200
+    finally:
+        s.close()
