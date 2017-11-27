@@ -124,8 +124,8 @@ def reorderqueue():
                     filter(Character.queue_pos > char.queue_pos).\
                     update({Character.queue_pos: Character.queue_pos - 1})
                 char.queue_pos = json_data['to_pos']
-                s.commit()
-                return '{"status": "ok"}',201
+            s.commit()
+            return '{"status": "ok"}',201
         except:
             return '',400
         finally:
