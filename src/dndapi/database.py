@@ -11,6 +11,7 @@ dbtable = os.environ['DBTABLE']
 # Connect to the database
 engine = create_engine(
   'mysql+pymysql://%s:%s@%s/%s?charset=utf8mb4'%(dbuser, dbpass, dbhost, dbtable),
+  pool_recycle=1800,
   echo=True)
 
 

@@ -3,7 +3,7 @@ from flask import request
 from flask_jwt import jwt_required, current_identity
 import json
 
-from sqlalchemy import or_
+from sqlalchemy import or_, func
 
 import dndapi.auth as auth
 from dndapi.database import Session, Dm
@@ -49,7 +49,7 @@ def get_currentdm():
 @jwt_required()
 def post_dm():
     # require admin creds
-    if current_identity != 'admin':
+    if current_identity.username != 'admin':
         return '', 401
     # pull the posted information from json and validate it
     json_data = request.get_json()
@@ -75,3 +75,24 @@ def post_dm():
             return '', 400
         finally:
             s.close()
+
+@app.route('/dmteamkills/', methods=['GET',])
+@jwt_required()
+def team_kills():
+    s = Session()
+    try:
+        teams = s.query(Dm.team, func.sum(Dm.num_kills)).group_by(Dm.team).all()
+        retobj = {
+            'duskpatrol': 0,
+            'moonwatch': 0,
+            'dawnguard': 0
+        }
+        for r in teams:
+            if r[0].lower() in retobj:
+                retobj[r[0].lower()] += int(r[1])
+        return json.dumps(retobj), 200
+    except:
+        return '', 400
+    finally:
+        s.close()
+

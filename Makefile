@@ -1,4 +1,4 @@
-RELEASE := "2"
+RELEASE := "3"
 
 all: build
 
@@ -7,3 +7,7 @@ build: clean
 
 clean:
 	docker rmi -f dndapi:$(RELEASE) || true
+
+push-image: build
+	docker tag dndapi:$(RELEASE) us.gcr.io/dndonations-176523/dndapi:$(RELEASE)
+	gcloud docker -- push us.gcr.io/dndonations-176523/dndapi:$(RELEASE)
