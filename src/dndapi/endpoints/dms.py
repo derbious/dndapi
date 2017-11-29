@@ -85,7 +85,7 @@ def team_kills():
         retobj = {
             'duskpatrol': 0,
             'moonwatch': 0,
-            'dawnguard': 0
+            'sunguard': 0
         }
         for r in teams:
             if r[0].lower() in retobj:
