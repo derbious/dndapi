@@ -62,7 +62,7 @@ class Character(Base):
 
     def __repr__(self):
         return "<Character(name='%s', race='%s', class='%s', state='%s', starttime='%s', deathtime='%s', num_resses='%s', queue_pos='%s')>" % (
-            self.name, self.race, self.char_class, self.state, self.starttime, self.deathtime, self.num_resses, queue_pos)
+            self.name, self.race, self.char_class, self.state, self.starttime, self.deathtime, self.num_resses, self.queue_pos)
 
 
 class Dm(Base):

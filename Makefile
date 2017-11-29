@@ -1,4 +1,4 @@
-RELEASE := "4"
+RELEASE := "5"
 
 all: build
 

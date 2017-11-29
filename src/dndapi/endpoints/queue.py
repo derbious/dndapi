@@ -159,3 +159,26 @@ def queue_remove(character_id=None):
     finally:
         s.close()
 
+# The /queue/unremove/ endpoint places the character back in the queue
+@app.route('/queue/unremove/<int:character_id>', methods=['POST'])
+@jwt_required()
+def queue_unremove(character_id=None):
+    if not character_id:
+        return '',400
+    s = Session()
+    try:
+        char = s.query(Character).\
+            filter(Character.id == character_id).\
+            one_or_none()
+        pos_max = s.query(func.max(Character.queue_pos)).\
+                filter(Character.state == 'waiting').\
+                one_or_none()[0]
+        char.state = 'waiting'
+        char.queue_pos = pos_max+1
+        s.commit()
+        return '{"status": "ok"}',201
+    except:
+        return '',400
+    finally:
+        s.close()
+
