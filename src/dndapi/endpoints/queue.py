@@ -172,9 +172,13 @@ def queue_unremove(character_id=None):
             one_or_none()
         pos_max = s.query(func.max(Character.queue_pos)).\
                 filter(Character.state == 'waiting').\
-                one_or_none()[0]
+                one_or_none()
+        if not pos_max[0]:
+            new_pos=1
+        else:
+            new_pos = pos_max[0]+1
         char.state = 'waiting'
-        char.queue_pos = pos_max+1
+        char.queue_pos = new_pos
         s.commit()
         return '{"status": "ok"}',201
     except:
