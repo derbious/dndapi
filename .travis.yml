@@ -1,11 +1,16 @@
 language: python
 python:
   - "3.6"
+before_install:
+  - './ci/setup.sh'
 install:
   - pip install -r src/requirements.txt
-script: pytest
-deploy:
-  provider: script
-  script: bash ci/deploy.sh
-  on:
-    branch: master
+script:
+  - 'make test'
+  - 'make image'
+after_success:
+  - if [[ "$TRAVIS_BRANCH" == "master" ]]; then
+      docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD} ;
+      make push-image ;
+    fi
+

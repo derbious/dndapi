@@ -1,13 +1,8 @@
-RELEASE := "6"
+test:
+	pytest
 
-all: build
+image:
+	docker build . -t dndapi:$(TRAVIS_JOB_ID)
 
-build: clean
-	docker build . -t dndapi:$(RELEASE)
-
-clean:
-	docker rmi -f dndapi:$(RELEASE) || true
-
-push-image: build
-	docker tag dndapi:$(RELEASE) us.gcr.io/dndonations-176523/dndapi:$(RELEASE)
-	gcloud docker -- push us.gcr.io/dndonations-176523/dndapi:$(RELEASE)
+image-push:
+	@echo "to be implemented [image-push]"
