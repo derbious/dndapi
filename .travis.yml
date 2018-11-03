@@ -4,3 +4,8 @@ python:
 install:
   - pip install -r src/requirements.txt
 script: pytest
+deploy:
+  provider: script
+  script: bash ci/deploy.sh
+  on:
+    branch: master
