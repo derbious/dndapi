@@ -1,13 +1,9 @@
-from dndapi import app
+from dndapi import app, datastore_client
 from flask import request
 from flask_jwt import jwt_required, current_identity
 import json
 
-from sqlalchemy import or_, func
-
 import dndapi.auth as auth
-from dndapi.database import Session, Dm
-
 
 def to_json(dm):
     jso = {
@@ -31,18 +27,20 @@ def validate_dms_post(js):
 @app.route('/currentdm/', methods=['GET',])
 @jwt_required()
 def get_currentdm():
-    s = Session()
-    try:
-        currentdm = s.query(Dm).\
-            filter(Dm.state == 'current').\
-            one_or_none()
-        if currentdm:
-            res = to_json(currentdm)
-            return to_json(currentdm), 200
-        else:
-            return '', 404
-    finally:
-        s.close()
+    query = datastore_client.query(kind='Dm')
+    query.add_filter('current', '=', True)
+    return json.dumps(list(query.fetch())), 200
+    # try:
+    #     currentdm = s.query(Dm).\
+    #         filter(Dm.state == 'current').\
+    #         one_or_none()
+    #     if currentdm:
+    #         res = to_json(currentdm)
+    #         return to_json(currentdm), 200
+    #     else:
+    #         return '', 404
+    # finally:
+    #     s.close()
 
 
 @app.route('/dms/', methods=['POST',])
@@ -76,23 +74,23 @@ def post_dm():
         finally:
             s.close()
 
-@app.route('/dmteamkills/', methods=['GET',])
-@jwt_required()
-def team_kills():
-    s = Session()
-    try:
-        teams = s.query(Dm.team, func.sum(Dm.num_kills)).group_by(Dm.team).all()
-        retobj = {
-            'duskpatrol': 0,
-            'moonwatch': 0,
-            'sunguard': 0
-        }
-        for r in teams:
-            if r[0].lower() in retobj:
-                retobj[r[0].lower()] += int(r[1])
-        return json.dumps(retobj), 200
-    except:
-        return '', 400
-    finally:
-        s.close()
+# @app.route('/dmteamkills/', methods=['GET',])
+# @jwt_required()
+# def team_kills():
+#     s = Session()
+#     try:
+#         teams = s.query(Dm.team, func.sum(Dm.num_kills)).group_by(Dm.team).all()
+#         retobj = {
+#             'duskpatrol': 0,
+#             'moonwatch': 0,
+#             'sunguard': 0
+#         }
+#         for r in teams:
+#             if r[0].lower() in retobj:
+#                 retobj[r[0].lower()] += int(r[1])
+#         return json.dumps(retobj), 200
+#     except:
+#         return '', 400
+#     finally:
+#         s.close()
 

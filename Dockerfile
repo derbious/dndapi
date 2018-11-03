@@ -1,7 +1,9 @@
-FROM python:3
+FROM python:3-alpine
 LABEL maintainer="Steven Anthony <derbious@gmail.com>"
 
 EXPOSE 5000
+
+RUN apk add build-base
 
 WORKDIR /usr/src/dndapi
 COPY src/ .

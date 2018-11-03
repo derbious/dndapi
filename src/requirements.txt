@@ -1,4 +1,3 @@
 Flask
 Flask-JWT
-Sqlalchemy
-pymysql
+google-cloud-datastore

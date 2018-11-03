@@ -1,5 +1,6 @@
 from flask import Flask, request
 from flask_jwt import JWT
+from google.cloud import datastore
 import datetime
 import logging
 import os
@@ -27,6 +28,9 @@ import dndapi.auth
 
 jwt = JWT(app, dndapi.auth.authenticate, dndapi.auth.identity)
 
-from dndapi.endpoints import index, search, donors, donations, characters, queue, dms
-import dndapi.database
+# Connect to the Google Datastore
+datastore_client = datastore.Client()
 
+from dndapi.endpoints import index, dms
+###, search, donors, donations, characters, queue, dms
+#import dndapi.database

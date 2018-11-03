@@ -11,10 +11,19 @@ class User(object):
     def __str__(self):
         return "User(id='%s')" % self.id
 
-# pull from ENV variables
+# pull from ENV variables or defaults
+try:
+    admin_pass = os.environ['ADMIN_PASSWORD']
+except:
+    admin_pass = "admin"
+try:
+    staff_pass = os.environ['STAFF_PASSWORD']
+except:
+    staff_pass = "staff"
+
 users = [
-    User(1, 'admin', os.environ['ADMIN_PASSWORD']),
-    User(2, 'staff', os.environ['STAFF_PASSWORD']),
+    User(1, 'admin', admin_pass),
+    User(2, 'staff', staff_pass),
 ]
 
 username_table = {u.username: u for u in users}
