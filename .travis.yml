@@ -10,7 +10,7 @@ script:
   - 'make image'
 after_success:
   - if [[ "$TRAVIS_BRANCH" == "master" ]]; then
-      docker login -u _json_key -p "${GCP_DOCKER_REGISTRY_CREDS}" https://gcr.io ;
+      docker login -u _json_key -p "$(echo $GCP_DOCKER_REGISTRY_CREDS | base64 --decode -)" https://gcr.io ;
       make push-image ;
     fi
 
