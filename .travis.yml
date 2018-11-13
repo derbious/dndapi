@@ -7,8 +7,7 @@ before_install:
 install:
 - pip install -r src/requirements.txt
 script:
-- make test
-- make image
+- pytest
 deploy:
   provider: gae
   keyfile: gcs_creds.json
