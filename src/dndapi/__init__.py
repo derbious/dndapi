@@ -8,6 +8,7 @@ import os
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.urandom(24).hex()
 app.config['JWT_EXPIRATION_DELTA'] = datetime.timedelta(days=1)
+app.config['JWT_AUTH_URL_RULE'] = '/api/auth'
 
 #log = logging.getLogger('werkzeug')
 #log.setLevel(logging.DEBUG)
@@ -31,6 +32,4 @@ jwt = JWT(app, dndapi.auth.authenticate, dndapi.auth.identity)
 # Connect to the Google Datastore
 datastore_client = datastore.Client()
 
-from dndapi.endpoints import index, dms
-###, search, donors, donations, characters, queue, dms
-#import dndapi.database
+from dndapi.endpoints import index, dms, queue, donors, search, donations, characters

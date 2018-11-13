@@ -1,31 +1,28 @@
-from dndapi import app
+from dndapi import app, datastore_client
 from flask import request
 from flask_jwt import jwt_required, current_identity
 import json
 from datetime import datetime
-
-from sqlalchemy import or_, func
+from google.cloud import datastore
 
 import dndapi.auth as auth
-from dndapi.database import Session, Donor, Character, Donation, Dm
 
 def to_json(char):
     jso = {
         'id': char.id,
-        'name': char.name,
-        'race': char.race,
-        'class': char.char_class,
-        'state': char.state,
-        'num_resses': char.num_resses,
-        'queue_pos': char.queue_pos,
-        'donor_id': char.donor_id
+        'name': char['name'],
+        'race': char['race'],
+        'class': char['class'],
+        'state': char['state'],
+        'num_resses': char['num_resses'],
+        'donor_id': char['donor_id']
     }
-    if char.starttime:
-        jso['starttime'] = char.starttime.isoformat()
+    if 'starttime' in char:
+        jso['starttime'] = char['starttime'].isoformat()
     else:
         jso['starttime'] = None
-    if char.deathtime:
-        jso['deathtime'] = char.deathtime.isoformat()
+    if 'deathtime' in char:
+        jso['deathtime'] = char['deathtime'].isoformat()
     else:
         jso['deathtime'] = None
     return json.dumps(jso)
@@ -90,88 +87,91 @@ def validate_res_post(js):
         return False
 
 
-@app.route('/characters/', methods=['GET', 'POST'])
-@app.route('/characters/<int:character_id>', methods=['GET'])
+@app.route('/api/characters/', methods=['GET', 'POST'])
+@app.route('/api/characters/<int:character_id>', methods=['GET'])
 @jwt_required()
 def get_characters(character_id=None):
     if request.method == 'GET':
-        # get a specific character. return its json
         if character_id:
-            s = Session()
-            try:
-                character = s.query(Character).filter(Character.id==character_id).one_or_none()
-                if character:
-                    character_json = to_json(character)
-                    return character_json 
-                else:
-                    return '', 404
-            finally:
-                s.close()
+            # get a specific character. return its json
+            key = datastore_client.key('Character', character_id)
+            entity = datastore_client.get(key)
+            app.logger.info(key)
+            app.logger.info(entity)
+            if entity:
+                return to_json(entity), 200
+            else:
+                return '', 404
         else:
             # Look for characters with a query string ?donor_id=2
             args = request.args
             if 'donor_id' in args:
-                donor_id = args['donor_id']
-                s = Session()
-                try:
-                    search_results = s.query(Character).filter(Character.donor_id==donor_id).all();
-                    if search_results == None:
-                        return '[]', 200
-                    else:
-                        ret = "[%s]"%','.join([to_json(x) for x in search_results])
-                        return ret
-                finally:
-                    s.close()
+                query = datastore_client.query(kind='Character')
+                query.add_filter('donor_id', '=', args['donor_id'])
+                j = '[%s]'%','.join([to_json(c) for c in list(query.fetch())])
+                return j, 200
             else:
-                return '',404
+                return '', 404
     elif request.method == 'POST':
         # pull the posted information from json and validate it
         json_data = request.get_json()
         if not json_data or not validate_new_character_post(json_data):
             return '', 400
         else:
-            # insert data into characters table
-            new_character = Character(
-                name = json_data['name'],
-                race = json_data['race'],
-                char_class = json_data['char_class'],
-                state = 'waiting',
-                donor_id = json_data['donor_id'])
-
-            new_donation = Donation(
-                donor_id = json_data['donor_id'],
-                amount = 5.00,
-                reason = 'Character',
-                timestamp = datetime.now(),
-                method = json_data['fee_type'])
-
+            # insert character object
+            # First, check that the donor_id exists, and that the character name
+            # is unique
+            donor_key = datastore_client.key('Donor', json_data['donor_id'])
+            donor_entity = datastore_client.get(donor_key)
             
-            #Grab the maximum queue_pos, and set it
-            s = Session()
-            try:
-                pos_max = s.query(func.max(Character.queue_pos)).filter(Character.state == 'waiting').one_or_none()
-                app.logger.info(pos_max)
+            char_query = datastore_client.query(kind='Character')
+            char_query.add_filter('name', '=', json_data['name'])
+            num_chars = len(list(char_query.fetch()))
+            if donor_entity != None:
+                app.logger.info("Can't find donor")
+                return '', 400
+            if num_chars > 0:
+                app.logger.info("Character name already exists")
+                return '{\"error\": \"character name already taken\"}', 400
 
-                if not pos_max[0]:
-                    new_pos=1
+            # Perform the 3 inserts in a transaction
+            with datastore_client.transaction():
+                # Create the new character entity
+                char_key = datastore_client.key('Character')
+                ce = datastore.Entity(key=char_key)
+                ce['name'] = json_data['name']
+                ce['race'] = json_data['race']
+                ce['class'] = json_data['char_class']
+                ce['donor_id'] = json_data['donor_id']
+                ce['state'] = 'queued'
+                ce['num_resses'] = 0
+                
+                # create the new donation (entry fee)
+                donation_key = datastore_client.key('Donation')
+                de = datastore.Entity(key=donation_key)
+                de['timestamp'] = datetime.now()
+                de['amount'] = 5.00
+                de['method'] = json_data['fee_type']
+                de['reason'] = 'character_entry'
+                de['donor_id'] = json_data['donor_id']
+
+                # Add the character to the end of the queue
+                playerqueue_key = datastore_client.key('Playerqueue', 'waiting')
+                pqe = datastore_client.get(key=playerqueue_key)
+                
+                if 'queue' not in pqe:
+                    pqe['queue'] = [ce['name'],]
                 else:
-                    new_pos = pos_max[0]+1
-                new_character.queue_pos = new_pos
+                    pqe['queue'].append(ce['name'])
+                datastore_client.put_multi([ce, de, pqe])
+            
+            return "{\"character_id\": %s}"%ce.id, 201
 
-                s.add(new_character)
-                s.add(new_donation)
-                s.commit()
-                return "{\"status\": \"ok\"}",201
-            finally:
-                s.close()
-
-
-
-#The /characters/startplay endpoint starts Pulls a character from the
-# waiting queue, and starts them playing
-@app.route('/characters/startplay/<int:character_id>', methods=['POST',])
+@app.route('/api/characters/startplay/<int:character_id>', methods=['POST',])
 @jwt_required()
 def rollinitiative(character_id=None):
+    ### The /characters/startplay endpoint starts Pulls a character from the
+    ### waiting queue, and starts them playing
     # Requires Admin token
     if current_identity.username != 'admin':
         return '',401
@@ -182,41 +182,29 @@ def rollinitiative(character_id=None):
         # Takes {seat_num: #} and starts their play
         if not json_data or not validate_startplay_post(json_data):
             return '', 400
-        s = Session()
-        try:
-            char = s.query(Character).\
-                filter(Character.id == character_id).\
-                one_or_none()
+        app.logger.info(json_data)
 
-            if not char:
-                return '',400
-            # Changes state of character to -playing-
-            char.state = 'playing'
+        idx = int(json_data['seat_num'])-1
+        with datastore_client.transaction():
+            characterkey = datastore_client.key('Character', character_id)
+            character = datastore_client.get(characterkey)
 
-            # needed for the math in the UPDATE
-            current_queue_pos = char.queue_pos
+            waitingqueue_key = datastore_client.key('Playerqueue', 'waiting')
+            wq = datastore_client.get(key=waitingqueue_key)
 
-            # sets the queue_pos to the negative of their seat number
-            char.queue_pos = json_data['seat_num'] * -1
-            # starts clock
-            char.starttime = datetime.now()
+            playingqueue_key = datastore_client.key('Playerqueue', 'playing')
+            pq = datastore_client.get(key=playingqueue_key)
 
-            ##subtract 1 from  everything above current_queue_pos
-            s.query(Character).\
-                filter(Character.state == 'waiting').\
-                filter(Character.queue_pos > current_queue_pos).\
-                update({Character.queue_pos: Character.queue_pos - 1})
+            character['state'] = 'playing'
+            wq['queue'].remove(character['name'])
+            pq['queue'][idx] = character['name']
 
-            s.commit()
-            return '{"status": "ok"}',201
-        except:
-            return '',400
-        finally:
-            s.close()
-
+            character['starttime'] = datetime.now()
+            datastore_client.put_multi([character, wq, pq])
+        return '{"status": "ok"}', 201
 
 #The /characters/death endpoint removes the character from play
-@app.route('/characters/death/<int:character_id>', methods=['POST',])
+@app.route('/api/characters/death/<int:character_id>', methods=['POST',])
 @jwt_required()
 def characterdeath(character_id=None):
     # Requires Admin token
@@ -225,31 +213,30 @@ def characterdeath(character_id=None):
     if character_id == None:
         return '',400
     else:
-        s = Session()
-        try:
-            char = s.query(Character).\
-                filter(Character.id == character_id).\
-                first()
-            dm = s.query(Dm).\
-                filter(Dm.state == 'current').\
-                first()
-            if not char:
-                return '', 400
-            char.state = 'dead'
-            char.deathtime = datetime.now()
-            char.queue_pos = None
-            dm.num_kills += 1
-            s.commit()
-            return "{\"status\": \"ok\"}",201
-        except:
-            return '',400
-        finally:
-            s.close()
+        # Get the character
+        characterkey = datastore_client.key('Character', character_id)
+        character = datastore_client.get(characterkey)
+        character['state'] = 'dead'
+        character['deathtime'] = datetime.now()
 
+        # Get the DM
+        query = datastore_client.query(kind='Dm')
+        query.add_filter('current', '=', True)
+        dm = list(query.fetch())[0]
+        dm['numkills'] += 1
+        
+        # update the "playing" queue - removing this character
+        playingqueue_key = datastore_client.key('Playerqueue', 'playing')
+        pq = datastore_client.get(key=playingqueue_key)
+        pq['queue'] = ['' if (n == character['name']) else n for n in pq['queue']]
+        
+        datastore_client.put_multi([character, dm, pq])
+
+        return "{\"status\": \"ok\"}",201
 
 # the /characters/res/ endpoint ressurects the player (optional cash
 # donation associated) admin creds needed
-@app.route('/characters/res/<int:character_id>', methods=['POST',])
+@app.route('/api/characters/res/<int:character_id>', methods=['POST',])
 @jwt_required()
 def characterres(character_id=None):
     # Requires Admin token
@@ -263,56 +250,47 @@ def characterres(character_id=None):
         #  {donation: {amt: 40, payment: 'cash'}
         if not json_data or not validate_res_post(json_data):
             return '', 400
-        s = Session()
-        try:
-            char = s.query(Character).\
-                filter(Character.id == character_id).\
-                first()
-            dm = s.query(Dm).\
-                filter(Dm.state == 'current').\
-                first()
-            if not char:
-                return '', 400
+        
+        # get a specific character. return its json
+        ck = datastore_client.key('Character', character_id)
+        ce = datastore_client.get(ck)
+        ce['num_resses'] += 1
+        
+        # update the dms kills
+        query = datastore_client.query(kind='Dm')
+        query.add_filter('current', '=', True)
+        dme = list(query.fetch())[0]
+        dme['numkills'] += 1
+        datastore_client.put_multi([ce, dme])
 
-            # add res
-            char.num_resses = char.num_resses+1
-            dm.num_kills += 1
-            if json_data['donation'] != None:
-                new_donation = Donation(
-                    timestamp = datetime.now(),
-                    amount = json_data['donation']['amt'],
-                    method = json_data['donation']['method'],
-                    reason = 'player_res',
-                    donor_id = char.donor_id)
-                s.add(new_donation)
-            s.commit()
-            return "{\"status\": \"ok\"}",201
-        except:
-            return '',400
-        finally:
-            s.close()
+        if 'donation' in json_data and json_data['donation'] != None:
+            dk = datastore_client.key('Donation')
+            de = datastore.Entity(key=dk)
+            de['donor_id'] = ce['donor_id']
+            de['method'] = json_data['donation']['method']
+            de['amount'] = json_data['donation']['amt']
+            de['reason'] = 'character_res'
+            de['timestamp'] = datetime.now()
+            datastore_client.put(de)
+
+        return "{\"status\": \"ok\"}",201
 
 #/characters/graveyard/ endpoint. returns current deaths ranked by
 # time alive
-@app.route('/characters/graveyard/', methods=['GET'])
+@app.route('/api/characters/graveyard/', methods=['GET'])
 @jwt_required()
 def graveyard():
-    s = Session()
-    try:
-        deadchars = s.query(Character,Donor).\
-            filter(Character.state == 'dead').\
-            join(Donor).\
-            all()
-        if not deadchars:
-            return '[]', 200
-        jso = []
-        for char in deadchars:
-            jso.append({
-                'name': char.Character.name,
-                'player': char.Donor.first_name,
-                'seconds_alive': (char.Character.deathtime - char.Character.starttime).total_seconds()
-            })
-            retjson = json.dumps(sorted(jso, key=lambda k: k['seconds_alive'], reverse=True))
-        return retjson,200
-    finally:
-        s.close()
+    query = datastore_client.query(kind='Character')
+    query.add_filter('state', '=', 'dead')
+    jso = []
+    for char in list(query.fetch()):
+        donorkey = datastore_client.key('Donor', int(char['donor_id']))
+        donor = datastore_client.get(donorkey)
+        jso.append({
+            'name': char['name'],
+            'player': donor['firstname'],
+            'seconds_alive': (char['deathtime'] - char['starttime']).total_seconds()
+        })
+    
+    retjson = json.dumps(sorted(jso, key=lambda k: k['seconds_alive'], reverse=True))
+    return retjson,200

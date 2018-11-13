@@ -1,24 +1,21 @@
-from dndapi import app
+from dndapi import app, datastore_client
 from flask import request
 from flask_jwt import jwt_required, current_identity
 import json
-
-from sqlalchemy import or_
+from google.cloud import datastore
 
 import dndapi.auth as auth
-from dndapi.database import Session, Donor
-
 
 def to_json(donor):
     jso = {
         'id': donor.id,
-        'firstname': donor.first_name,
-        'lastname': donor.last_name,
-        'email': donor.email_address,
-        'address': donor.physical_address
+        'firstname': donor['firstname'],
+        'lastname': donor['lastname'],
+        'email': donor['email'],
+        'address': donor['address']
     }
-    if donor.dci_number:
-        jso['dci'] = donor.dci_number
+    if 'dci' in donor:
+        jso['dci'] = donor['dci']
     return json.dumps(jso)
 
 def validate_donor_post(js):
@@ -32,24 +29,21 @@ def validate_donor_post(js):
         return False
 
 
-@app.route('/donors/', methods=['POST',])
-@app.route('/donors/<int:donor_id>', methods=['GET'])
+@app.route('/api/donors/', methods=['POST',])
+@app.route('/api/donors/<int:donor_id>', methods=['GET'])
 @jwt_required()
 def get_donors(donor_id=None):
-    app.logger.info("in get_donors()")
     if request.method == 'GET':
         # get a specific donor. return its json
         if donor_id:
-            s = Session()
-            try:
-                donor = s.query(Donor).filter(Donor.id==donor_id).one_or_none()
-                if donor:
-                    donor_json = to_json(donor)
-                    return donor_json
-                else:
-                    return '', 404
-            finally:
-                s.close()
+            key = datastore_client.key('Donor', donor_id)
+            entity = datastore_client.get(key)
+            app.logger.info(key)
+            app.logger.info(entity)
+            if entity:
+                return to_json(entity), 200
+            else:
+                return '', 404
         else:
             return '',404
     elif request.method == 'POST':
@@ -60,19 +54,21 @@ def get_donors(donor_id=None):
         if not json_data or not validate_donor_post(json_data):
             return '', 400
         else:
-            # insert data into donors table
-            new_donor = Donor(first_name=json_data['firstname'],
-                    last_name=json_data['lastname'],
-                    email_address=json_data['email'],
-                    physical_address=json_data['address'],
-                    dci_number=json_data.get('dci', None))
-            s = Session()
-            try:
-                s.add(new_donor)
-                s.commit()
-                s.flush()
-                return "{\"donor_id\": %s}"%new_donor.id, 201
-            except:
-                return '', 400
-            finally:
-                s.close()
+            # Check to see if the donor isn't already there
+            query = datastore_client.query(kind='Donor')
+            query.add_filter('email', '=', json_data['email'])
+            if len(list(query.fetch())) > 0:
+                return '{\"error\": \"Already exists\"}', 400
+
+            # insert the Donor object
+            key = datastore_client.key('Donor')
+            app.logger.info(key)
+            entity = datastore.Entity(key=key)
+            entity['firstname'] = json_data['firstname']
+            entity['lastname'] = json_data['lastname']
+            entity['email'] = json_data['email']
+            entity['address'] = json_data['address']
+            entity['dci'] = json_data.get('dci', '')
+            datastore_client.put(entity)
+            app.logger.info(entity)
+            return "{\"donor_id\": %s}"%entity.id, 201
