@@ -6,7 +6,13 @@ import logging
 import os
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.urandom(24).hex()
+# read the secret.txt file
+try:
+    secret_key = open('/secretkey.txt','r').readlines()[0].strip()
+except:
+    secret_key = os.urandom(24).hex()
+
+app.config['SECRET_KEY'] = secret_key
 app.config['JWT_EXPIRATION_DELTA'] = datetime.timedelta(days=1)
 app.config['JWT_AUTH_URL_RULE'] = '/api/auth'
 
