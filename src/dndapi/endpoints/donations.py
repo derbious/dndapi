@@ -8,7 +8,7 @@ from google.cloud import datastore
 import dndapi.auth as auth
 
 
-def to_json(donation):
+def press_x_to_json(donation):
     jso = {
         'id': donation.id,
         'timestamp': donation['timestamp'].isoformat(),
@@ -45,7 +45,7 @@ def get_donations(donation_id=None):
             key = datastore_client.key('Donation', donation_id)
             entity = datastore_client.get(key)
             if entity:
-                return to_json(entity), 200
+                return presS_x_to_json(entity), 200
             else:
                 return '', 404
         else:
@@ -58,7 +58,7 @@ def get_donations(donation_id=None):
                 results = list(query.fetch())
                 sorted_results = sorted(results, key=lambda k: k['timestamp'], reverse=True)
                 app.logger.info(sorted_results)
-                return '[%s]' % ','.join([to_json(r) for r in sorted_results]), 200
+                return '[%s]' % ','.join([press_x_to_json(r) for r in sorted_results]), 200
             else:
                 return '',404
     elif request.method == 'POST':
