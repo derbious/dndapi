@@ -1,39 +1,28 @@
 import os
-from werkzeug.security import safe_str_cmp
+import bcrypt
+from dndapi import datastore_client
 
 # Define a User obj. needed for authentication
 class User(object):
-    def __init__(self, id, username, password):
+    def __init__(self, id, username):
         self.id = id
         self.username = username
-        self.password = password
     
     def __str__(self):
-        return "User(id='%s')" % self.id
-
-# pull from ENV variables or defaults
-try:
-    admin_pass = os.environ['ADMIN_PASSWORD']
-except:
-    admin_pass = "admin"
-try:
-    staff_pass = os.environ['STAFF_PASSWORD']
-except:
-    staff_pass = "staff"
-
-users = [
-    User(1, 'admin', admin_pass),
-    User(2, 'staff', staff_pass),
-]
-
-username_table = {u.username: u for u in users}
-userid_table = {u.id: u for u in users}
+        return "User(id='%s',username='%s')"%(self.id, self.username)
 
 def authenticate(username, password):
-    user = username_table.get(username, None)
-    if user and safe_str_cmp(user.password.encode('utf-8'), password.encode('utf-8')):
-        return user
+    query = datastore_client.query(kind='User')
+    query.add_filter('username', '=', username)
+    users = list(query.fetch())
+    if len(users) == 1:
+        u = users[0]
+        if bcrypt.checkpw(password, u['password']):
+            return User(u.id, u['username'])
 
 def identity(payload):
     user_id = payload['identity']
-    return userid_table.get(user_id, None)
+    uk = datastore_client.key('User', user_id)
+    user = datastore_client.get(uk)
+    if user:
+        return User(user_id, user['username'])

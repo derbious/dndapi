@@ -6,11 +6,14 @@ import logging
 import os
 
 app = Flask(__name__)
-# read the secret.txt file
+# read the secretkey.txt file
 try:
     secret_key = open('/secretkey.txt','r').readlines()[0].strip()
 except:
     secret_key = os.urandom(24).hex()
+
+# Connect to the Google Datastore
+datastore_client = datastore.Client()
 
 app.config['SECRET_KEY'] = secret_key
 app.config['JWT_EXPIRATION_DELTA'] = datetime.timedelta(days=1)
@@ -34,8 +37,5 @@ def after_request(response):
 import dndapi.auth
 
 jwt = JWT(app, dndapi.auth.authenticate, dndapi.auth.identity)
-
-# Connect to the Google Datastore
-datastore_client = datastore.Client()
 
 from dndapi.endpoints import index, dms, queue, donors, search, donations, characters
