@@ -30,11 +30,8 @@ app.logger.info("perform_https_redirect: %s", perform_https_redirect)
 
 @app.before_request
 def https_redirect():
-    if perform_https_redirect and not request.is_secure:
-        app.logger.info("Doing https request")
+    if perform_https_redirect and request.headers.get('X-Forwarded-Proto', None) == 'http':
         return redirect(request.url.replace('http://', 'https://'), 301)
-    else:
-        app.logger.info('Not doing http request')
         
 
 # Deal with CORS
