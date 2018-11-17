@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, redirect
 from flask_jwt import JWT
 from google.cloud import datastore
 import datetime
@@ -22,6 +22,20 @@ app.config['JWT_AUTH_URL_RULE'] = '/api/auth'
 #log = logging.getLogger('werkzeug')
 #log.setLevel(logging.DEBUG)
 #log.addHandler(logging.StreamHandler())
+
+# Redirect to HTTPS iff we have a "HTTPS" env variable
+perform_https_redirect = os.getenv('HTTPS', "false") == "true"
+
+app.logger.info("perform_https_redirect: %s", perform_https_redirect)
+
+@app.before_request
+def https_redirect():
+    if perform_https_redirect and not request.is_secure:
+        app.logger.info("Doing https request")
+        return redirect(request.url.replace('http://', 'https://'), 301)
+    else:
+        app.logger.info('Not doing http request')
+        
 
 # Deal with CORS
 @app.after_request
