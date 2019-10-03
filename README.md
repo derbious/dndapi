@@ -1,12 +1,23 @@
-# dndonations api
+# dndonations Web App
 
-#Testing
-## Create network
-docker network create dndapinet
-## Stand up database
-docker run -d -e MYSQL_ROOT_PASSWORD=devboxen --name mysql --network=dndapinet mysql:latest
-## stand up database-web interface
-docker run -d --network=dndapinet -p8080:8080 adminer:latest
-## Build and run the app's docker image
-make && docker run -p5000:5000 -e ADMIN_PASSWORD=admin123 -e STAFF_PASSWORD=staff123 -e DBUSER=root -e DBPASS=devboxen -e DBHOST=mysql -e DBTABLE=dndapi_2017 --network dndapinet dndapi:1
+## Description
+This is a basic python(flask) CRUD app that uses sqlite. It serves up the API endpoints
+and the static html that runs our dndonations logging system
 
+## Development
+### Requirements
+To get the development environment up and running you need docker installed.
+
+### Testing workflow
+1. Do some editing
+2. Rebuild the container with the command `docker build . -t dndapi` 
+3. Run the newly built container: `docker run -it -p 8080:8080 dndapi` This binds to port 8080 to serve up the web frontend
+4. Point your browser to `http://localhost:8080/` to see your changes in action.
+
+The terminal output should show python logging info, and the browser developer console shows the javascript related debug info.
+
+### Notable files
+* `__init__.py`: This kicks off the webserver.
+* `auth.py`: This handles the authentication. we are using JWT to do the API auth
+* `database.py`: This is the database controller. it contains all of the sqlite3 code
+* `endpoints/*.py`: These run all of the api endpoints. They are separated out by function
