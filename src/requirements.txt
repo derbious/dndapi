@@ -1,5 +1,2 @@
 Flask
 Flask-JWT
-google-cloud-datastore
-py-bcrypt
-

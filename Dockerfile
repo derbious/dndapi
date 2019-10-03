@@ -1,9 +1,7 @@
 FROM python:3-alpine
-LABEL maintainer="Steven Anthony <derbious@gmail.com>"
+LABEL maintainer="Steven Anthony <steven@derbious.com>"
 
 EXPOSE 8080
-
-RUN apk add build-base
 
 WORKDIR /usr/src/dndapi
 COPY src/requirements.txt .
@@ -12,7 +10,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY src/ .
 RUN pip install --no-cache-dir -e .
 
-RUN python -c "import os;print(os.urandom(24).hex());" > /secretkey.txt
+#RUN python -c "import os;print(os.urandom(24).hex());" > /secretkey.txt
+RUN echo "some_secret" > /secretkey.txt
+RUN mkdir /data
 
 ENV FLASK_APP dndapi
 ENV FLASK_DEBUG 1

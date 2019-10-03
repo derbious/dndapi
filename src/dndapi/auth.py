@@ -1,6 +1,4 @@
 import os
-import bcrypt
-from dndapi import datastore_client
 
 # Define a User obj. needed for authentication
 class User(object):
@@ -12,17 +10,11 @@ class User(object):
         return "User(id='%s',username='%s')"%(self.id, self.username)
 
 def authenticate(username, password):
-    query = datastore_client.query(kind='User')
-    query.add_filter('username', '=', username)
-    users = list(query.fetch())
-    if len(users) == 1:
-        u = users[0]
-        if bcrypt.checkpw(password, u['password']):
-            return User(u.id, u['username'])
+    #TODO fix this
+    if username == 'admin':
+        return User(1,'admin')
+    else:
+        return None
 
 def identity(payload):
-    user_id = payload['identity']
-    uk = datastore_client.key('User', user_id)
-    user = datastore_client.get(uk)
-    if user:
-        return User(user_id, user['username'])
+    return User(1, 'admin')

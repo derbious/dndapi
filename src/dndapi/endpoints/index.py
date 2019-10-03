@@ -10,8 +10,7 @@ def root():
 
 @app.route("/<path:path>")
 def index(path):
-    return send_from_directory(staticdir, path)
-    
+    return send_from_directory(staticdir, path)   
 
 @app.route("/api/check")
 @jwt_required()

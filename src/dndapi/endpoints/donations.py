@@ -1,18 +1,17 @@
-from dndapi import app, datastore_client
+from dndapi import app
 from flask import request
 from flask_jwt import jwt_required, current_identity
 import json
 from datetime import datetime
-from google.cloud import datastore
 
 import dndapi.auth as auth
-
+import dndapi.database as database
 
 def press_x_to_json(donation):
     jso = {
-        'id': donation.id,
-        'timestamp': donation['timestamp'].isoformat(),
-        'amount': str(donation['amount']),
+        'id': donation['id'],
+        'timestamp': donation['timestamp'],
+        'amount': str(int(donation['amount'])/100.0),
         'method': donation['method'],
         'reason': donation['reason'],
         'donor_id': donation['donor_id']
@@ -40,12 +39,11 @@ def validate_donation_post(js):
 @jwt_required()
 def get_donations(donation_id=None):
     if request.method == 'GET':
-        # get a specific donor. return its json
+        # get a specific donation. return its json
         if donation_id:
-            key = datastore_client.key('Donation', donation_id)
-            entity = datastore_client.get(key)
-            if entity:
-                return presS_x_to_json(entity), 200
+            d = database.get_donation_by_id(donation_id)
+            if d:
+                return press_x_to_json(d), 200
             else:
                 return '', 404
         else:
@@ -53,30 +51,27 @@ def get_donations(donation_id=None):
             args = request.args
             if 'donor_id' in args:
                 donor_id = args['donor_id']
-                query = datastore_client.query(kind='Donation')
-                query.add_filter('donor_id', '=', donor_id)
-                results = list(query.fetch())
-                sorted_results = sorted(results, key=lambda k: k['timestamp'], reverse=True)
-                app.logger.info(sorted_results)
-                return '[%s]' % ','.join([press_x_to_json(r) for r in sorted_results]), 200
+                donations = database.get_donations_for_donor(donor_id)
+                app.logger.info(donations)
+                return '[%s]' % ','.join([press_x_to_json(r) for r in donations]), 200, {'Content-Type': 'application/json; charset=utf-8'}
             else:
                 return '',404
     elif request.method == 'POST':
         # pull the posted information from json and validate it
         json_data = request.get_json()
+        app.logger.info(json_data)
         if not json_data or not validate_donation_post(json_data):
             app.logger.info("shit was bad %s", json_data)
             return '', 400
         else:
-            app.logger.info("it worked well.")
             # insert the Donations object
-            key = datastore_client.key('Donation')
-            e = datastore.Entity(key=key)
-            e['timestamp'] = datetime.now()
-            e['amount'] = json_data['amount']
-            e['method'] = json_data['method']
-            e['reason'] = json_data['reason']
-            e['donor_id'] = json_data['donor_id']
-            datastore_client.put(e)
-            app.logger.info(e)
-            return "{\"donation_id\": %s}"%e.id, 201
+            d = database.insert_donation(int(float(json_data['amount'])*100),
+                               json_data['method'],
+                               json_data['reason'],
+                               json_data['donor_id'])
+            app.logger.info(d)
+            if d:
+                app.logger.info(d)
+                return press_x_to_json(d), 201, {'Content-Type': 'application/json; charset=utf-8'}
+            else:
+                return '{"error": "Could not insert donation"}', 400, {'Content-Type': 'application/json; charset=utf-8'}

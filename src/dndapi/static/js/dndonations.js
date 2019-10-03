@@ -19,6 +19,7 @@ $(function () {
         'Content-Type': 'application/json' },
       dataType: 'json',
       success: function(r) {
+          console.log(r);
           sessionStorage.setItem('access_token', r['access_token']);
           $('#navLoginButton').hide().addClass('hidden');
         }
@@ -41,6 +42,7 @@ $(function () {
       },
       success: function(data) {
         // display the results in the table
+        console.log(data);
         renderDonorSearchTable(JSON.parse(data));
       },
       error: function() {
@@ -65,18 +67,22 @@ $(function () {
     var token = sessionStorage.getItem('access_token');
     $.ajax({
       url: "api/donors/",
-      type: 'post',
+      type: 'POST',
       data: JSON.stringify(d),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': "JWT " + token
       },
       dataType: 'json',
-      success: function(data) {
+      statusCode: {
+        201: function(data) {
+          console.log(data)
           $('#donorInvalidRequest').hide().addClass('invisible');
-          renderDonorViewPage(data.donor_id);
+          renderDonorViewPage(data.id);
+        }
       },
       error: function(e) {
+          console.log(e);
           $('#donorInvalidRequest').show().removeClass('invisible');
       }
     });
@@ -108,7 +114,7 @@ $(function () {
   credCheck(); // call it right off
 
 
-  setInterval(refreshPlayerQueue, 5000);
+  //setInterval(refreshPlayerQueue, 5000);
   function refreshPlayerQueue() {
     var token = sessionStorage.getItem('access_token');
     $.ajax({
@@ -118,8 +124,8 @@ $(function () {
         },
         dataType: 'json',
         success: function(e){
-          $('#playerQueuePage').html('<ul id="playerQueueList" class="list-group col-8"></ul>');
           console.log(e);
+          $('#playerQueuePage').html('<ul id="playerQueueList" class="list-group col-8"></ul>');
           for(i=0; i<e['waiting'].length; i++){
             pq_id = "pq-"+i
             idx = parseInt(i, 10)+1;
@@ -172,6 +178,7 @@ $(function () {
       data: JSON.stringify(movedata),
       dataType: 'json',
       success: function(data) {
+        console.log(data)
         refreshPlayerQueue();
       }
     });
@@ -252,6 +259,7 @@ $(function () {
     $.each(pagesToHide(pages, 4), function(index, value) {
       value.hide().addClass('invisible');
     });
+    console.log('Starting donor view render');
     //$('#donorViewPage').html('donorView: donor_id='+donor_id);
     var token = sessionStorage.getItem('access_token');
     // Grab the donor info from the web service
@@ -270,7 +278,7 @@ $(function () {
         dataType: 'json'
       });
     var characterp = $.ajax({
-        url: "api/characters/?donor_id="+donor_id,
+        url: "api/characters/?player_id="+donor_id,
         headers: {
           'Authorization': "JWT " + token
         },
@@ -278,20 +286,21 @@ $(function () {
       });
     
     $.when(donorp,donationp,characterp).done(function(donor_res,donations_res,characters_res) {
+      console.log('BLARG');
       console.log('attempting to display characters', characters_res);
       var donor = donor_res[0];
       var donations = donations_res[0];
       var characters = characters_res[0];
       //console.log('attempting to display characters', characters);
-      if(!donor.dci){
-        donor.dci = ''
+      if(!donor.dci_number){
+        donor.dci_number = ''
       }
       var render = '<div class="container-fluid row justify-content-center my-3">';
       render += '<div class="col-8"><h2>Donor Information</h2><table class="table">';
-      render += '<tr><td>First Name</td><td>'+donor.firstname+'</td></tr>'
-      render += '<tr><td>Last Name</td><td>'+donor.lastname+'</td></tr>'
-      render += '<tr><td>Email Address</td><td>'+donor.email+'</td></tr>'
-      render += '<tr><td>DCI Number</td><td>'+donor.dci+'</td></tr>'
+      render += '<tr><td>First Name</td><td>'+donor.first_name+'</td></tr>'
+      render += '<tr><td>Last Name</td><td>'+donor.last_name+'</td></tr>'
+      render += '<tr><td>Email Address</td><td>'+donor.email_address+'</td></tr>'
+      render += '<tr><td>DCI Number</td><td>'+donor.dci_number+'</td></tr>'
       render += '</table>';
       render += '<h3>Characters</h3>';
       render += '<a id="addCharacterButton" class="btn btn-primary" href="#">Add Character</a>';
@@ -358,6 +367,7 @@ $(function () {
       },
       dataType: 'json',
       success: function(data) {
+          console.log(data);
           $('#donationError').hide().addClass('invisible');
           renderDonorViewPage(d.donor_id);
       },
@@ -370,7 +380,7 @@ $(function () {
   $('#characterForm').submit(function(event){
     event.preventDefault();
     //pull data from form, do an AJAX call
-    var d = { donor_id: $('#characterDonorId').val(),
+    var d = { player_id: $('#characterDonorId').val(),
               name: $('#characterName').val(),
               race: $('#characterRace').val(),
               char_class: $('#characterClass').val(),
@@ -387,8 +397,9 @@ $(function () {
       },
       dataType: 'json',
       success: function(data) {
+          console.log(data);
           $('#characterError').hide().addClass('invisible');
-          renderDonorViewPage(d.donor_id);
+          renderDonorViewPage(d.player_id);
       },
       error: function(e) {
           $('#characterError').show().removeClass('invisible');
@@ -407,6 +418,7 @@ $(function () {
       },
       dataType: 'json',
       success: function(data) {
+        console.log(data);
         renderDonorViewPage(donor_id);
       }
     });
@@ -435,7 +447,7 @@ $(function () {
   function renderDonorSearchTable(data) {
     render = "<div class=\"col-8\"><table class=\"table\"><thead><th>#</th><th>first name</th><th>last name</th><th>email</th></thead><tbody>";
     for(var i=0; i<data.length; i++){
-      render += "<tr><td><a href=\"javascript:renderDonorViewPage("+data[i].id+");\">"+data[i].id+"</a></td><td>"+data[i].firstname+"</td><td>"+data[i].lastname+"</td><td>"+data[i].email+"</td></tr>";
+      render += "<tr><td><a href=\"javascript:renderDonorViewPage("+data[i].id+");\">"+data[i].id+"</a></td><td>"+data[i].first_name+"</td><td>"+data[i].last_name+"</td><td>"+data[i].email_address+"</td></tr>";
     }
     render += "</tbody></table></div>";
     $('#searchResultTable').html(render);

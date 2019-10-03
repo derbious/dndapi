@@ -1,21 +1,21 @@
-from dndapi import app, datastore_client
+from dndapi import app
 from flask import request
 from flask_jwt import jwt_required, current_identity
 import json
 from datetime import datetime
-from google.cloud import datastore
 
 import dndapi.auth as auth
+import dndapi.database as database
 
 def to_json(char):
     jso = {
-        'id': char.id,
+        'id': char['id'],
         'name': char['name'],
         'race': char['race'],
         'class': char['class'],
         'state': char['state'],
         'num_resses': char['num_resses'],
-        'donor_id': char['donor_id']
+        'player_id': char['player_id']
     }
     if 'starttime' in char:
         jso['starttime'] = char['starttime'].isoformat()
@@ -55,8 +55,8 @@ def validate_new_character_post(js):
             'race' in js and
             'char_class' in js and
             'fee_type' in js and
-            'donor_id' in js and
-            js['donor_id'].isdigit()):
+            'player_id' in js and
+            js['player_id'].isdigit()):
         return True
     else:
         return False
@@ -94,78 +94,29 @@ def get_characters(character_id=None):
     if request.method == 'GET':
         if character_id:
             # get a specific character. return its json
-            key = datastore_client.key('Character', character_id)
-            entity = datastore_client.get(key)
-            app.logger.info(key)
-            app.logger.info(entity)
-            if entity:
-                return to_json(entity), 200
+            character = database.get_character_by_id(character_id)
+            if character:
+                return to_json(character), 200, {'Content-Type': 'application/json; charset=utf-8'}
             else:
                 return '', 404
         else:
-            # Look for characters with a query string ?donor_id=2
+            # Look for characters with a query string ?player_id=2
             args = request.args
-            if 'donor_id' in args:
-                query = datastore_client.query(kind='Character')
-                query.add_filter('donor_id', '=', args['donor_id'])
-                j = '[%s]'%','.join([to_json(c) for c in list(query.fetch())])
-                return j, 200
+            if 'player_id' in args:
+                chars = database.get_characters_for_player(args['player_id'])
+                j = '[%s]'%','.join([to_json(c) for c in chars])
+                return j, 200, {'Content-Type': 'application/json; charset=utf-8'}
             else:
                 return '', 404
     elif request.method == 'POST':
         # pull the posted information from json and validate it
         json_data = request.get_json()
         if not json_data or not validate_new_character_post(json_data):
+            app.logger.info(json_data)
             return '', 400
-        else:
-            # insert character object
-            # First, check that the donor_id exists, and that the character name
-            # is unique
-            donor_key = datastore_client.key('Donor', json_data['donor_id'])
-            donor_entity = datastore_client.get(donor_key)
-            
-            char_query = datastore_client.query(kind='Character')
-            char_query.add_filter('name', '=', json_data['name'])
-            num_chars = len(list(char_query.fetch()))
-            if donor_entity != None:
-                app.logger.info("Can't find donor")
-                return '', 400
-            if num_chars > 0:
-                app.logger.info("Character name already exists")
-                return '{\"error\": \"character name already taken\"}', 400
-
-            # Perform the 3 inserts in a transaction
-            with datastore_client.transaction():
-                # Create the new character entity
-                char_key = datastore_client.key('Character')
-                ce = datastore.Entity(key=char_key)
-                ce['name'] = json_data['name']
-                ce['race'] = json_data['race']
-                ce['class'] = json_data['char_class']
-                ce['donor_id'] = json_data['donor_id']
-                ce['state'] = 'queued'
-                ce['num_resses'] = 0
-                
-                # create the new donation (entry fee)
-                donation_key = datastore_client.key('Donation')
-                de = datastore.Entity(key=donation_key)
-                de['timestamp'] = datetime.now()
-                de['amount'] = 5.00
-                de['method'] = json_data['fee_type']
-                de['reason'] = 'character_entry'
-                de['donor_id'] = json_data['donor_id']
-
-                # Add the character to the end of the queue
-                playerqueue_key = datastore_client.key('Playerqueue', 'waiting')
-                pqe = datastore_client.get(key=playerqueue_key)
-                
-                if 'queue' not in pqe:
-                    pqe['queue'] = [ce['name'],]
-                else:
-                    pqe['queue'].append(ce['name'])
-                datastore_client.put_multi([ce, de, pqe])
-            
-            return "{\"character_id\": %s}"%ce.id, 201
+        else:    
+            d = database.insert_character(json_data['name'], json_data['race'], json_data['char_class'], 'queued', json_data['player_id'])
+            return "{\"character_id\": %s}"% d['id'], 201, {'Content-Type': 'application/json; charset=utf-8'}
 
 @app.route('/api/characters/startplay/<int:character_id>', methods=['POST',])
 @jwt_required()

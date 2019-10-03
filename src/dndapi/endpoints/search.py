@@ -1,11 +1,12 @@
-from dndapi import app, datastore_client
+from dndapi import app
 import flask
 from flask_jwt import jwt_required, current_identity
 import json
 
 import dndapi.auth as auth
-from dndapi.endpoints.donors import to_json
+import dndapi.database as database
 
+from dndapi.endpoints.donors import to_json
 
 @app.route('/api/search', methods=['GET',])
 @jwt_required()
@@ -14,11 +15,11 @@ def search():
     if 'q' in args:
         q = args['q']
         result_array = []
-        query = datastore_client.query(kind='Donor')
-        for r in list(query.fetch()):
-            if q in r['firstname'] or q in r['lastname'] or q in r['email']:
+        donors = database.get_all_donors()
+        app.logger.info(donors)
+        for r in donors:
+            if q in r['first_name'] or q in r['last_name'] or q in r['email_address']:
                 result_array.append(r)
-        
         if result_array == None:
             return '[]', 200
         else:
