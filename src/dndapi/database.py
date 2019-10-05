@@ -24,6 +24,15 @@ def makedb():
             timestamp   TIMESTAMP NOT NULL,
             amount      INTEGER NOT NULL,
             method      TEXT NOT NULL,
+            donor_id    INTEGER NOT NULL,
+            FOREIGN KEY(donor_id) REFERENCES donors(id)
+        );''')
+
+        c.execute('''
+        CREATE TABLE IF NOT EXISTS purchases (
+            id          INTEGER PRIMARY KEY,
+            timestamp   TIMESTAMP NOT NULL,
+            amount      INTEGER NOT NULL,
             reason      TEXT NOT NULL,
             donor_id    INTEGER NOT NULL,
             FOREIGN KEY(donor_id) REFERENCES donors(id)
@@ -46,7 +55,7 @@ def makedb():
         dbconn.commit()
 
 # DONOR FUNCTIONS
-def get_donor_by_id(donor_id):   
+def get_donor_by_id(donor_id):
     with sqlite3.connect(DATABASE_LOCATION) as dbconn:
         c = dbconn.cursor()
         app.logger.info('before querty')
@@ -108,7 +117,6 @@ def insert_new_donor(first_name,
 
 ######################################
 ### DONATION QUERIES
-
 def get_donation_by_id(donation_id):
     with sqlite3.connect(DATABASE_LOCATION) as dbconn:
         c = dbconn.cursor()
@@ -119,7 +127,6 @@ def get_donation_by_id(donation_id):
                      'timestamp': row[1],
                      'amount': row[2],
                      'method': row[3],
-                     'reason': row[4],
                      'donor_id': row[4] }
         else:
             return None
@@ -135,26 +142,54 @@ def get_donations_for_donor(donor_id):
                'timestamp': row[1],
                'amount': row[2],
                'method': row[3],
-               'reason': row[4],
-               'donor_id': row[5] } )
+               'donor_id': row[4] } )
         return res
 
-def insert_donation(amount, method, reason, donor_id):
+def insert_donation(amount, method, donor_id):
     with sqlite3.connect(DATABASE_LOCATION) as dbconn:
         c = dbconn.cursor()
-        c.execute("""INSERT INTO donations(amount, timestamp, method, reason, donor_id) values(?,?,?,?,?)""", 
-                  [amount, datetime.now(), method, reason, donor_id])
+        c.execute("""INSERT INTO donations(amount, timestamp, method, donor_id) values(?,?,?,?)""", 
+                  [amount, datetime.now(), method, donor_id])
         c.execute("""SELECT * FROM donations WHERE rowid=?;""", (c.lastrowid,))
         row = c.fetchone()
         res = {'id': row[0],
                'timestamp': row[1],
                'amount': row[2],
                'method': row[3],
-               'reason': row[4],
-               'donor_id': row[5] }
+               'donor_id': row[4] }
         dbconn.commit()
         return res
 
+#############################
+## Purchases queries
+def insert_purchase(amount, reason, donor_id):
+    with sqlite3.connect(DATABASE_LOCATION) as dbconn:
+        c = dbconn.cursor()
+        c.execute("""INSERT INTO purchases(amount, timestamp, reason, donor_id) values(?,?,?,?,?)""", 
+                  [amount, datetime.now(), reason, donor_id])
+        c.execute("""SELECT * FROM purchases WHERE rowid=?;""", (c.lastrowid,))
+        row = c.fetchone()
+        res = {'id': row[0],
+               'timestamp': row[1],
+               'amount': row[2],
+               'reson': row[3],
+               'donor_id': row[4] }
+        dbconn.commit()
+        return res
+
+def get_purchase_by_id(purchase_id):
+    with sqlite3.connect(DATABASE_LOCATION) as dbconn:
+        c = dbconn.cursor()
+        c.execute('SELECT * FROM purchases WHERE id=?', (purchase_id,) )
+        row = c.fetchone()
+        if row:
+            return { 'id': row[0],
+                     'timestamp': row[1],
+                     'amount': row[2],
+                     'reason': row[3],
+                     'donor_id': row[4] }
+        else:
+            return None
 
 #############################
 ## Characters queries
@@ -213,38 +248,6 @@ def insert_character(name, race, clazz, state, player_id):
                 'end_time': row[8] }
         dbconn.commit()
         return res
-
-# class Donation(Base):
-#     __tablename__ = 'donations'
-#     id = Column(Integer, primary_key=True)
-#     timestamp = Column(DateTime, nullable=False)
-#     amount = Column(Numeric(13,2), nullable=False)
-#     method = Column(String(30), nullable=False)
-#     reason = Column(String(10), nullable=False)
-#     donor_id = Column(Integer, ForeignKey('donors.id'), nullable=False)
-
-#     def __repr__(self):
-#         return "<Donation(timestamp='%s', amount='%s', method='%s', reason='%s')>" % (
-#                 self.timestamp, self.amount, self.method, self.reason)
-
-
-# class Character(Base):
-#     __tablename__ = 'characters'
-#     id = Column(Integer, primary_key=True)
-#     name = Column(String(10), nullable=False)
-#     race = Column(String(20), nullable=False)
-#     char_class = Column(String(20), nullable=False)
-#     state = Column(String(10), nullable=False)
-#     starttime = Column(DateTime)
-#     deathtime = Column(DateTime)
-#     num_resses = Column(Integer, nullable=False, default=0)
-#     queue_pos = Column(Integer)
-#     donor_id = Column(Integer, ForeignKey('donors.id'), nullable=False)
-
-#     def __repr__(self):
-#         return "<Character(name='%s', race='%s', class='%s', state='%s', starttime='%s', deathtime='%s', num_resses='%s', queue_pos='%s')>" % (
-#             self.name, self.race, self.char_class, self.state, self.starttime, self.deathtime, self.num_resses, self.queue_pos)
-
 
 # class Dm(Base):
 #     __tablename__ = 'dms'

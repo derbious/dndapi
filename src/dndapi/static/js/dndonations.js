@@ -324,9 +324,9 @@ $(function () {
       //Loop throught the donations
       console.log('attempting to display donations', donations);
       if(donations.length > 0){
-        render += '<table class="table"><thead><tr><th>timestamp</th><th>amount</th><th>method</th><th>reason</th></thead></tr>';
+        render += '<table class="table"><thead><tr><th>timestamp</th><th>amount</th><th>method</th></thead></tr>';
         for(i=0; i<donations.length; i++){
-          render += '<tr><td>'+donations[i].timestamp+'</td><td>'+donations[i].amount+'</td><td>'+donations[i].method+'</td><td>'+donations[i].reason+'</td></tr>';
+          render += '<tr><td>'+donations[i].timestamp+'</td><td>'+donations[i].amount+'</td><td>'+donations[i].method+'</td></tr>';
         }
         render += '</table>';
       }
@@ -353,8 +353,7 @@ $(function () {
     //pull data from form, do an AJAX call
     var d = { donor_id: $('#donationDonorId').val(),
               amount: $('#donationAmount').val(),
-              method: $('#donationMethod').val(),
-              reason: $('#donationReason').val()
+              method: $('#donationMethod').val()
     }
     var token = sessionStorage.getItem('access_token');
     $.ajax({

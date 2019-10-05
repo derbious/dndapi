@@ -21,3 +21,51 @@ The terminal output should show python logging info, and the browser developer c
 * `auth.py`: This handles the authentication. we are using JWT to do the API auth
 * `database.py`: This is the database controller. it contains all of the sqlite3 code
 * `endpoints/*.py`: These run all of the api endpoints. They are separated out by function
+
+## Techical Details
+### DB Schema
+```
++------------------------------+
+|Donors                        |
++------------------------------+
+|id               INTEGER pkey +<---+-+-+
+|first_name       TEXT         |    | | |
+|last_name        TEXT         |    | | |
+|physical_address TEXT         |    | | |
+|dci_number       TEXT         |    | | |
++------------------------------+    | | |
+                                    | | |
++-----------------------+           | | |
+|Donations              |           | | |
++-----------------------+           | | |
+|id        INTEGER pkey |           | | |
+|timestamp TIMESTAMP    |           | | |
+|amount    INTEGER      |           | | |
+|method    TEXT         |           | | |
+|donor_id  INTEGER      +-----------+ | |
++-----------------------+             | |
+                                      | |
++------------------------+            | |
+|Purchases               |            | |
++------------------------+            | |
+|id        INTEGER pkey  |            | |
+|timestamp TIMESTAMP     |            | |
+|amount    INTEGER       |            | |
+|reason    TEXT          |            | |
+|donor_id  INTEGER       +------------+ |
++------------------------+              |
+                                        |
++-------------------------+             |
+|Characters               |             |
++-------------------------+             |
+|id          INTEGER pkey |             |
+|name        TEXT UNIQUE  |             |
+|race        TEXT         |             |
+|class       TEXT         |             |
+|state       TEXT         |             |
+|num_resses  INTEGER      |             |
+|player_id   INTEGER      +-------------+
+|start_time  TIMESTAMP    |
+|end_time    TIMESTAMP    |
++-------------------------+
+```

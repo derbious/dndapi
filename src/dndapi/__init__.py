@@ -48,5 +48,5 @@ import dndapi.auth
 
 jwt = JWT(app, dndapi.auth.authenticate, dndapi.auth.identity)
 
-from dndapi.endpoints import index, donors, search, donations, characters
+from dndapi.endpoints import index, donors, search, donations, characters, purchases
 ###queue, dms

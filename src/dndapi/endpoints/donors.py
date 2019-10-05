@@ -52,6 +52,9 @@ def get_donors(donor_id=None):
         if not json_data or not validate_donor_post(json_data):
             return '', 400
         else:
+            # make dci availabe if not entered
+            if 'dci' not in json_data:
+                json_data['dci'] = None
             # insert the new donor
             app.logger.info(json_data)
             ins_donor = database.insert_new_donor(json_data['firstname'],
