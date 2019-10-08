@@ -1,14 +1,14 @@
-from dndapi import app, datastore_client
+from dndapi import app
 from flask import request
 from flask_jwt import jwt_required, current_identity
 import json
-from google.cloud import datastore
 
 import dndapi.auth as auth
+import dndapi.database as database
 
 def to_json(dm):
     jso = {
-        'id': dm.id,
+        'id': dm['id'],
         'name': dm['name'],
         'team': dm['team'],
         'numkills': dm['numkills'],
@@ -24,15 +24,16 @@ def validate_dms_post(js):
     else:
         return False
 
-@app.route('/api/currentdm/', methods=['GET',])
+@app.route('/api/currentdm', methods=['GET',])
 @jwt_required()
 def get_currentdm():
-    query = datastore_client.query(kind='Dm')
-    query.add_filter('current', '=', True)
-    return to_json(list(query.fetch())[0]), 200
+    dm = database.get_current_dm()
+    if dm:
+        return to_json(dm), 200, {'Content-Type': 'application/json; charset=utf-8'}
+    else:
+        return '', 404
 
-
-@app.route('/api/dms/', methods=['POST',])
+@app.route('/api/dms', methods=['POST',])
 @jwt_required()
 def post_dm():
     # require admin creds
@@ -43,48 +44,12 @@ def post_dm():
     if not json_data or not validate_dms_post(json_data):
         return '', 400
     else:
-        # Clear out the old current DM
-        query = datastore_client.query(kind='Dm')
-        query.add_filter('current', '=', True)
-        for dm in list(query.fetch()):
-            dm['current'] = False
-            datastore_client.put(dm)
-
-        # Create the new Dm entity
-        dm_key = datastore_client.key('Dm')
-        de = datastore.Entity(key=dm_key)
-        de['name'] = json_data['name']
-        de['numkills'] = 0
-        de['current'] = True
-        de['team'] = json_data['team']
-        datastore_client.put(de)
-        
-    return '{\"status\", \"ok\"}', 201
+        database.insert_current_dm(json_data['name'], json_data['team'])
+        return '{\"status\", \"ok\"}', 201, {'Content-Type': 'application/json; charset=utf-8'}
 
 
-@app.route('/api/dmteamkills/', methods=['GET',])
+@app.route('/api/dmteamkills', methods=['GET',])
 @jwt_required()
 def team_kills():
-    retobj = {
-        'duskpatrol': 0,
-        'moonwatch': 0,
-        'sunguard': 0
-    }
-    # Search duskpatrol
-    query = datastore_client.query(kind='Dm')
-    query.add_filter('team', '=', "Duskpatrol")
-    for dm in list(query.fetch()):
-        retobj['duskpatrol'] += dm['numkills']
-
-    query = datastore_client.query(kind='Dm')
-    query.add_filter('team', '=', "Moonwatch")
-    for dm in list(query.fetch()):
-        retobj['moonwatch'] += dm['numkills']
-        query = datastore_client.query(kind='Dm')
-
-    query.add_filter('team', '=', "Sunguard")
-    for dm in list(query.fetch()):
-        retobj['sunguard'] += dm['numkills']
-
-    return json.dumps(retobj), 200
+    return json.dumps(database.select_dm_teamkills()), 200, {'Content-Type': 'application/json; charset=utf-8'}
 

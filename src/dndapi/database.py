@@ -51,9 +51,29 @@ def makedb():
             end_time    TIMESTAMP,
             FOREIGN KEY(player_id) REFERENCES donors(id)
         );''')
+
+        c.execute('''
+        CREATE TABLE IF NOT EXISTS dms (
+            id         INTEGER PRIMARY KEY,
+            name       TEXT NOT NULL,
+            team       TEXT NOT NULL,
+            numkills   INTEGER DEFAULT 0,
+            current    INTEGER default 0
+        )''')
+
+        c.execute('''
+        CREATE TABLE IF NOT EXISTS queue(
+            id            INTEGER PRIMARY KEY,
+            position      INTEGER NOT NULL,
+            character_id  INTEGER NOT NULL,
+            FOREIGN KEY(character_id) REFERENCES characters(id)
+        )''')
         # commit the changes
         dbconn.commit()
 
+
+
+###############################################################################################
 # DONOR FUNCTIONS
 def get_donor_by_id(donor_id):
     with sqlite3.connect(DATABASE_LOCATION) as dbconn:
@@ -115,7 +135,10 @@ def insert_new_donor(first_name,
         dbconn.commit()
         return res
 
-######################################
+
+
+
+##################################################################################################
 ### DONATION QUERIES
 def get_donation_by_id(donation_id):
     with sqlite3.connect(DATABASE_LOCATION) as dbconn:
@@ -160,7 +183,10 @@ def insert_donation(amount, method, donor_id):
         dbconn.commit()
         return res
 
-#############################
+
+
+
+#####################################################################################################
 ## Purchases queries
 def insert_purchase(amount, reason, donor_id):
     with sqlite3.connect(DATABASE_LOCATION) as dbconn:
@@ -191,7 +217,10 @@ def get_purchase_by_id(purchase_id):
         else:
             return None
 
-#############################
+
+
+
+###################################################################################################
 ## Characters queries
 ###### 
 def get_character_by_id(character_id):
@@ -249,18 +278,44 @@ def insert_character(name, race, clazz, state, player_id):
         dbconn.commit()
         return res
 
-# class Dm(Base):
-#     __tablename__ = 'dms'
-#     id = Column(Integer, primary_key=True)
-#     name = Column(String(30), nullable=False)
-#     team = Column(String(30), nullable=False)
-#     num_kills = Column(Integer, nullable=False, default=0)
-#     state = Column(String(20))
 
-#     def __repr__(self):
-#         return "<Dm(id='%s', name='%s', team='%s', num_kills='%s', state='%s')>" % (
-#                 self.id, self.name, self.team, self.num_kills, self.state)
 
-# # create the schema
-# Base.metadata.create_all(engine)
 
+#################################################################################################
+### DM queries
+def get_current_dm():
+    with sqlite3.connect(DATABASE_LOCATION) as dbconn:
+        c = dbconn.cursor()
+        c.execute("""SELECT * FROM dms WHERE current=1;""")
+        row = c.fetchone()
+        if row:
+            return {
+                'id': row[0],
+                'name': row[1],
+                'team': row[2],
+                'numkills': row[3],
+                'current': row[4]
+            }
+        else:
+            return None
+
+def insert_current_dm(name, team):
+    with sqlite3.connect(DATABASE_LOCATION) as dbconn:
+        c = dbconn.cursor()
+        ## Remove the current one
+        c.execute("""UPDATE dms SET current = 0 WHERE current = 1;""")
+        ## Add the new one
+        c.execute("""INSERT INTO dms(name, team, current) values(?,?,?)""", [name, team, 1])
+        dbconn.commit()
+
+def select_dm_teamkills():
+    ## This query sums up all of the dmkills based on their team.
+    with sqlite3.connect(DATABASE_LOCATION) as dbconn:
+        c = dbconn.cursor()
+        ## Remove the current one
+        c.execute("""SELECT team, sum(numkills) FROM dms GROUP BY team""")
+        rows = c.fetchall()
+        result = {}
+        for row in rows:
+            result[row[0]] = row[1]
+        return result

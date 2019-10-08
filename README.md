@@ -25,47 +25,35 @@ The terminal output should show python logging info, and the browser developer c
 ## Techical Details
 ### DB Schema
 ```
-+------------------------------+
-|Donors                        |
-+------------------------------+
-|id               INTEGER pkey +<---+-+-+
-|first_name       TEXT         |    | | |
-|last_name        TEXT         |    | | |
-|physical_address TEXT         |    | | |
-|dci_number       TEXT         |    | | |
-+------------------------------+    | | |
-                                    | | |
-+-----------------------+           | | |
-|Donations              |           | | |
-+-----------------------+           | | |
-|id        INTEGER pkey |           | | |
-|timestamp TIMESTAMP    |           | | |
-|amount    INTEGER      |           | | |
-|method    TEXT         |           | | |
-|donor_id  INTEGER      +-----------+ | |
-+-----------------------+             | |
-                                      | |
-+------------------------+            | |
-|Purchases               |            | |
-+------------------------+            | |
-|id        INTEGER pkey  |            | |
-|timestamp TIMESTAMP     |            | |
-|amount    INTEGER       |            | |
-|reason    TEXT          |            | |
-|donor_id  INTEGER       +------------+ |
-+------------------------+              |
-                                        |
-+-------------------------+             |
-|Characters               |             |
-+-------------------------+             |
-|id          INTEGER pkey |             |
-|name        TEXT UNIQUE  |             |
-|race        TEXT         |             |
-|class       TEXT         |             |
-|state       TEXT         |             |
-|num_resses  INTEGER      |             |
-|player_id   INTEGER      +-------------+
-|start_time  TIMESTAMP    |
-|end_time    TIMESTAMP    |
-+-------------------------+
++------------------------------+          +-------------------------+
+|Donors                        |          |Characters               |
++------------------------------+          +-------------------------+
+|id               INTEGER pkey +<-+-+-+   |id          INTEGER pkey <--+
+|first_name       TEXT         |  | | |   |name        TEXT UNIQUE  |  |
+|last_name        TEXT         |  | | |   |race        TEXT         |  |
+|physical_address TEXT         |  | | |   |class       TEXT         |  |
+|dci_number       TEXT         |  | | |   |state       TEXT         |  |
++------------------------------+  | | |   |num_resses  INTEGER      |  |
+                                  | | +---+player_id   INTEGER      |  |
++-----------------------+         | |     |start_time  TIMESTAMP    |  |
+|Donations              |         | |     |end_time    TIMESTAMP    |  |
++-----------------------+         | |     +-------------------------+  |
+|id        INTEGER pkey |         | |                                  |
+|timestamp TIMESTAMP    |         | |     +-------------------------+  |
+|amount    INTEGER      |         | |     |Queue                    |  |
+|method    TEXT         |         | |     |                         |  |
+|donor_id  INTEGER      +---------+ |     |id           INTEGER pkey|  |
++-----------------------+           |     |position     INTEGER     |  |
+                                    |     |character_id INTEGER     +--+
++------------------------+          |     +-------------------------+
+|Purchases               |          |
++------------------------+          |     +-----------------------+
+|id        INTEGER pkey  |          |     |Dms                    |
+|timestamp TIMESTAMP     |          |     +-----------------------+
+|amount    INTEGER       |          |     |id        INTEGER pkey |
+|reason    TEXT          |          |     |name      TEXT         |
+|donor_id  INTEGER       +----------+     |team      TEXT         |
++------------------------+                |numkills  INTEGER      |
+                                          |current   INTEGER      |
+                                          +-----------------------+
 ```
