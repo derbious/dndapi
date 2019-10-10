@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" ng-app>
+  <head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.8/angular.min.js"></script>
+  <script scr="js/newdndonations.js"></script>
+
+  <!-- Bootstrap CSS
+  <link rel="stylesheet" href="css/bootstrap.min.css"> -->
+  </head>
+  <body>
+    <!-- main search page -->
+    <div id="searchPage" ng-controller="SearchPage">
+            <form id="donorSearchForm">
+              <div class="container-fluid row justify-content-center">
+                <div class="col-6">
+                  <div class="form-group">
+                    <label for="donorSearch" class="sr-only">Donor search</label>
+                    <input type="text" class="form-control" id="donorSearch" placeholder="search" ng-bind="donorSearchText">
+                  </div>
+                </div>
+                <div class="col-2">
+                  <button type="submit" class="btn btn-primary" ng-click="doSearch">Search</button>
+                </div>
+              </div>
+            </form>
+  </body>
+</html>
