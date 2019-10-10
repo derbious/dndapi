@@ -1,0 +1,28 @@
+h1, h2, h3, h4, h5, h6 {
+    font-family: "Press Start 2P";
+}
+
+.grid-container {
+    display: grid;
+    gap: 1em;
+    grid-template-columns: repeat(12, 1fr);
+}
+
+.box {
+    background-color: gray;
+    color: white;
+    padding: .25em;
+    border-radius: 10px;
+}
+ 
+.hd {
+    grid-column: 1 / -1;
+}
+
+.main {
+    grid-column: 1 / 9;
+}
+
+.qu {
+    grid-column: 9 / 13;
+}
