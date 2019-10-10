@@ -5,7 +5,9 @@ h1, h2, h3, h4, h5, h6 {
 .grid-container {
     display: grid;
     gap: 1em;
-    grid-template-columns: repeat(12, 1fr);
+    grid-template-areas: 
+    "hd hd hd hd hd"
+    "main main main qu qu"
 }
 
 .box {
@@ -16,13 +18,22 @@ h1, h2, h3, h4, h5, h6 {
 }
  
 .hd {
-    grid-column: 1 / -1;
+    grid-area: hd;
 }
 
 .main {
-    grid-column: 1 / 9;
+    grid-area: main;
 }
 
 .qu {
-    grid-column: 9 / 13;
+    grid-area: qu;
+}
+
+@media only screen and (max-width: 500px) {
+    .grid-container {
+        grid-template-areas: 
+        "hd"
+        "main"
+        "qu"        
+    }
 }
