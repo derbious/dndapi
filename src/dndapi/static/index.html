@@ -11,17 +11,48 @@
 </head>
 <body>
     <div class="grid-container">
+
         <div class="box hd"><h2>DnDonations Management Console</h2>
-            <div class="login"><button class="button" id="login-button">Log In</button></div>
+            <!-- this button needs to call the #lm modal -->
+            <div class="login"><button id="login-button">Log In</button></div>
         </div>
+        
         <div class="box boon">Boon</div>
+
         <div class="box bane">Bane</div>
+        
         <div class="box dn"><h3>Donor Administration</h3>
             <div class="donadmin">FORM GOES HERE</div>
         </div>
+        
         <div class="box qu"><h3>Player Queue</h3>
             <div class="playqu">WIDGET GOES HERE</div>
         </div>
+
+    </div>
+
+    <!-- this line to be removed when login button works-->
+    <a href="#lm">click to test login modal</a>
+
+    <!-- login modal -->
+    <div id="lm" class="logmodal">
+            <div>
+                <a href="#close" title="Close" class="close">X</a>
+                <h2>Please Log In</h2>
+                <form action="#" method="POST">
+                    <p>
+                        <label for="username">Username</label>
+                        <input type="text" id="username" name="user_name" required>
+                    </p>
+                    <p>
+                        <label for="pwd">Password</label>
+                        <input type="password" id="pwd" name="password" required>
+                    </p>
+                    <input type="submit" value="Log In">
+                </form>
+                
+            </div>
+
     </div>
 </body>
 </html>
