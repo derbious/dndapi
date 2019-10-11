@@ -5,7 +5,7 @@
     gap: 1em;
     grid-template-areas: 
     "hd hd hd hd hd hd"
-    "dn dn dn dn boon bane"
+    "dn dn dn dn bb bb"
     "dn dn dn dn qu qu"
 }
 
@@ -27,13 +27,17 @@
     grid-area: dn;
 }
 
-.boon {
-    grid-area: boon;
+.bb {
+    grid-area: bb;
+    display: grid;
+    gap: 1em;
+    grid-template-columns: repeat(2, 1fr);
+    padding: 1em;
 }
 
-.bane {
+/* .bane {
     grid-area: bane;
-}
+} */
 
 .qu {
     grid-area: qu;
@@ -43,6 +47,7 @@
     .grid-container {
         grid-template-areas: 
         "hd"
+        "bb"
         "dn"
         "qu"        
     }
@@ -99,6 +104,8 @@ input[type=text], input[type=password] {
     display: inline-block;
     border: 1px solid #ccc;
     box-sizing: border-box;
+    font-family: "PT Sans";
+    font-size: 1em;
   }
 
 .login {
@@ -139,6 +146,11 @@ input[type=text], input[type=password] {
     border-radius: 10px;
     background: #8286A0;
     color: white;
+}
+
+#un, #pw {
+    font-family: "PT Sans";
+    font-size: 1.5em;
 }
 
 .close {

@@ -9,7 +9,9 @@
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.8/angular.min.js"></script>
     <title>DnDonations Management Console</title>
 </head>
+
 <body>
+
     <div class="grid-container">
 
         <div class="box hd"><h2>DnDonations Management Console</h2>
@@ -17,9 +19,10 @@
             <div class="login"><button id="login-button">Log In</button></div>
         </div>
         
-        <div class="box boon">Boon</div>
-
-        <div class="box bane">Bane</div>
+        <div class="box bb">
+            <button id="boon-btn">Boon</button>
+            <button id="bane-btn">Bane</button>
+        </div>
         
         <div class="box dn"><h3>Donor Administration</h3>
             <div class="donadmin">FORM GOES HERE</div>
@@ -42,11 +45,11 @@
                 <fieldset>
                     <form action="#" method="POST">
                         <p>
-                            <label for="username">Username</label>
+                            <label id="un" for="username">Username</label>
                             <input type="text" id="username" name="user_name" required>
                         </p>
                         <p>
-                            <label for="pwd">Password</label>
+                            <label id="pw" for="pwd">Password</label>
                             <input type="password" id="pwd" name="password" required>
                         </p>
                         <input type="submit" style="display: none" />
