@@ -1,39 +1,91 @@
-h1, h2, h3, h4, h5, h6 {
-    font-family: "Press Start 2P";
-}
+/* layout */ 
 
 .grid-container {
     display: grid;
     gap: 1em;
     grid-template-areas: 
-    "hd hd hd hd hd"
-    "main main main qu qu"
+    "hd hd hd hd hd hd"
+    "dn dn dn dn boon bane"
+    "dn dn dn dn qu qu"
 }
 
 .box {
-    background-color: gray;
+    background-color: #8286A0;
     color: white;
     padding: .25em;
     border-radius: 10px;
+    box-shadow: 3px 5px rgba(67, 73, 108, 1);
 }
  
 .hd {
     grid-area: hd;
+    display: grid;
+    grid-template-columns: 5fr 1fr;
 }
 
-.main {
-    grid-area: main;
+.dn {
+    grid-area: dn;
+}
+
+.boon {
+    grid-area: boon;
+}
+
+.bane {
+    grid-area: bane;
 }
 
 .qu {
     grid-area: qu;
 }
 
-@media only screen and (max-width: 500px) {
+@media only screen and (max-width: 700px) {
     .grid-container {
         grid-template-areas: 
         "hd"
-        "main"
+        "dn"
         "qu"        
     }
+}
+
+/* general styles */
+
+body {
+    font-family: "PT Sans";
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: "Press Start 2P";
+    padding: 0 0 0 .5em;
+}
+
+.button {
+    font-family: "Press Start 2P";
+    background-color: rgba(80, 65, 108, .85);
+    color: white;
+    font-size: 1.25em;
+    padding: 10px;
+    border: none;
+}
+
+.button:hover {
+    opacity: .6;
+}
+
+.button:active {
+    background color: white;
+    color: rgba(80, 65, 108, .85);
+}
+
+#login-button{
+    
+}
+
+.login {
+    align-self: center;
+    justify-self: center;
+}
+
+.donadmin, .playqu {
+    padding: .5em;
 }
