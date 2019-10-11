@@ -64,12 +64,10 @@ button {
     background-color: rgba(80, 65, 108, .85);
     color: white;
     font-size: 1.25em;
-    padding: 10px;
+    padding: 5px 10px 5px 10px;
     border: none;
     outline: 0;
 }
-
-
 
 button:hover {
     box-shadow: 0 10px 10px 0 rgba(255, 255, 255, 0.35), 0 10px 50px 0 rgba(255, 255, 255, 0.19);
@@ -79,6 +77,29 @@ button:active {
     background-color: white;
     color: rgba(80, 65, 108, .85);
 }
+
+input[type=submit] {
+    font-family: "Press Start 2P";
+    background-color: rgba(80, 65, 108, .85);
+    color: white;
+    font-size: 1.25em;
+    padding: 5px 10px 5px 10px;
+    border: none;
+    outline: 0;
+}
+
+input[type=submit]:hover {
+    box-shadow: 0 10px 10px 0 rgba(255, 255, 255, 0.35), 0 10px 50px 0 rgba(255, 255, 255, 0.19);
+}
+
+input[type=text], input[type=password] {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+  }
 
 .login {
     align-self: center;
@@ -98,7 +119,7 @@ button:active {
     right: 0;
     bottom: 0;
     left: 0;
-    background: rgba(0 , 0, 0, .8);
+    background: rgba(0 , 0, 0, .85);
     z-index: 99999;
     opacity: 0;
     transition: opacity 400ms ease-in;
@@ -116,8 +137,8 @@ button:active {
     margin: 10% auto;
     padding: 5px 20px 13px 20px;
     border-radius: 10px;
-    background: #fff;
-    background: linearGradient(#fff, #999);
+    background: #8286A0;
+    color: white;
 }
 
 .close {
@@ -136,3 +157,8 @@ button:active {
 }
 
 .close:hover { background: #00d9ff; }
+
+fieldset {
+    border: none;
+}
+

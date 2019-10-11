@@ -39,17 +39,19 @@
             <div>
                 <a href="#close" title="Close" class="close">X</a>
                 <h2>Please Log In</h2>
-                <form action="#" method="POST">
-                    <p>
-                        <label for="username">Username</label>
-                        <input type="text" id="username" name="user_name" required>
-                    </p>
-                    <p>
-                        <label for="pwd">Password</label>
-                        <input type="password" id="pwd" name="password" required>
-                    </p>
-                    <input type="submit" value="Log In">
-                </form>
+                <fieldset>
+                    <form action="#" method="POST">
+                        <p>
+                            <label for="username">Username</label>
+                            <input type="text" id="username" name="user_name" required>
+                        </p>
+                        <p>
+                            <label for="pwd">Password</label>
+                            <input type="password" id="pwd" name="password" required>
+                        </p>
+                        <input type="submit" style="display: none" />
+                    </form>
+                </fieldset>
                 
             </div>
 
