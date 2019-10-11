@@ -20,12 +20,41 @@
         </div>
         
         <div class="box bb">
+<!-- Think we need to take a big picture look at purchasing, what's 
+available for purchase, how to handle. FREX lots of things not just boon
+and bane are "purchase items" so do they need to be featured like this in 
+mian view? Should there be a whole area for purchase-handling? Think 
+that's how to do it; as it stands now the main form area streches this div 
+out and looks stupid. :) -->
+
             <button id="boon-btn">Boon</button>
             <button id="bane-btn">Bane</button>
         </div>
         
         <div class="box dn"><h3>Donor Administration</h3>
-            <div class="donadmin">FORM GOES HERE</div>
+            <div class="donadmin">
+                <!-- gotta figure out how to display one of these at a time based on what we're doing-->
+                
+                <!-- donor search screen -->
+                <div id="lookup">
+                    <h3>Donor Lookup</h3>
+                    <form action="#" method="GET">
+                        <input type="search" id="donor-lookup" placeholder="Enter donor information.">
+                        <input type="submit" value="Find Donor">
+                    </form>
+                </div>
+
+                <!-- add donor account -->
+                <div id="new-donor">
+                    <h3>Create New Donor</h3>
+                    <fieldset>
+                        <form action="#" method="POST">
+                            <input type="text" id="firsname" placeholder="First Name">
+                        </form>
+                    </fieldset>
+
+                </div>
+            </div>
         </div>
         
         <div class="box qu"><h3>Player Queue</h3>
@@ -34,7 +63,7 @@
 
     </div>
 
-    <!-- this line to be removed when login button works-->
+    <!-- this line to be removed when top login button works-->
     <a href="#lm">click to test login modal</a>
 
     <!-- login modal -->
@@ -59,5 +88,7 @@
             </div>
 
     </div>
+
+    
 </body>
 </html>
