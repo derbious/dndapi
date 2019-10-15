@@ -120,11 +120,11 @@ input[type=text], input[type=password] {
     border: 1px solid #ccc;
     box-sizing: border-box;
     font-family: "PT Sans";
-    font-size: 1em;
+    font-size: 1.25em;
   }
 
 input[type=search] {
-    width: 80%;
+    width: 100%;
     padding: 5px 20px;
     margin: 8px 0;
     display: inline-block;
@@ -178,6 +178,8 @@ input[type=search] {
     font-family: "PT Sans";
     font-size: 1.5em;
 }
+
+
 
 .close {
 	background: #606061;
