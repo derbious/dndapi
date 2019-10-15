@@ -52,12 +52,17 @@
 /* general styles */
 
 body {
-    font-family: "PT Sans";
+    background-color: rgba(34, 31, 42, 0.966);
 }
 
 h1, h2, h3, h4, h5, h6 {
     font-family: "Press Start 2P";
-    padding: 0 0 0 .5em;
+    color: white;
+    padding: 0 0 0 8px;
+}
+
+#lookup > h2 {
+    padding: 0;
 }
 
 button {
@@ -66,17 +71,21 @@ button {
     color: white;
     font-size: 1.25em;
     padding: 8px;
-    border: none;
+    border: 5px solid transparent;
     outline: 0;
+    cursor: pointer;
 }
 
 button:hover {
-    box-shadow: 0 10px 10px 0 rgba(255, 255, 255, 0.35), 0 10px 50px 0 rgba(255, 255, 255, 0.19);
+    background-color: white;
+    color: rgba(80, 65, 108, .85);
+    border: 5px solid rgba(80, 65, 108, .85);
 }
 
 button:active {
-    background-color: white;
-    color: rgba(80, 65, 108, .85);
+    background-color: rgba( 40, 25, 69,1);
+    color: white;
+    border: 5px solid white;
 }
 
 input[type=submit] {
@@ -85,15 +94,23 @@ input[type=submit] {
     color: white;
     font-size: 1.25em;
     padding: 8px;
-    border: none;
+    border: 5px solid transparent;
     outline: 0;
+    cursor: pointer;
 }
 
 input[type=submit]:hover {
-    box-shadow: 0 10px 10px 0 rgba(255, 255, 255, 0.35), 0 10px 50px 0 rgba(255, 255, 255, 0.19);
+    background-color: white;
+    color: rgba(80, 65, 108, .85);
+    border: 5px solid rgba(80, 65, 108, .85);    
 }
 
-/* NEED TO SEPARATE FORM STYLING BETWEEN LOGIN MODAL AND MAIN FORMS */
+input[type=submit]:active {
+    background-color: rgba( 40, 25, 69,1);
+    color: white;
+    border: 5px solid white;
+}
+
 
 input[type=text], input[type=password] {
     width: 100%;
