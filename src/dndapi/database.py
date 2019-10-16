@@ -83,17 +83,27 @@ def get_donor_by_id(donor_id):
         app.logger.info('before fetchone')
         row = c.fetchone()
         app.logger.info('after fetchone')
+        result = {}
         if row:
             app.logger.info('row exists')
-            return { 'id': row[0],
+            result = {'id': row[0],
                     'first_name': row[1],
                     'last_name': row[2],
                     'physical_address': row[3],
                     'dci_number': row[4],
                     'email_address': row[5] }
+
+            # This query gets their account balance
+            c.execute("""SELECT donsum-pursum FROM 
+                (SELECT COALESCE(SUM(amount),0) as donsum FROM donations WHERE donor_id=?) as a,
+                (SELECT COALESCE(SUM(amount),0) as pursum FROM purchases WHERE donor_id=?) as b;""", [donor_id,donor_id])
+            dsrow = c.fetchone()
+            result['balance'] = dsrow[0]/100.0
+            return result
         else:
             app.logger.info('No rows found')
             return None
+        
     
 def get_all_donors():   
     with sqlite3.connect(DATABASE_LOCATION) as dbconn:
@@ -134,8 +144,6 @@ def insert_new_donor(first_name,
            'email_address': row[5] }
         dbconn.commit()
         return res
-
-
 
 
 ##################################################################################################

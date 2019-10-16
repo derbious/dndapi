@@ -21,8 +21,7 @@ def validate_donation_post(js):
     # Validate donation object
     if ('amount' in js and
             'method' in js and
-            'donor_id' in js and
-            js['donor_id'].isdigit()):
+            'donor_id' in js):
         try:
             x = float(js['amount'])
             return True

@@ -6,8 +6,6 @@ import json
 import dndapi.auth as auth
 import dndapi.database as database
 
-from dndapi.endpoints.donors import to_json
-
 @app.route('/api/search', methods=['GET',])
 @jwt_required()
 def search():
@@ -23,7 +21,7 @@ def search():
         if result_array == None:
             return '[]', 200
         else:
-            ret = "[%s]"%','.join([to_json(x) for x in result_array])
+            ret = "[%s]"%','.join([json.dumps(x) for x in result_array])
             return ret
     else:
         return '', 200

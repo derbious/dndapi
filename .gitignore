@@ -2,3 +2,5 @@ gcs_creds.json
 .vscode
 */__pycache__
 */.pytest_cache
+colors.css
+colors2.css

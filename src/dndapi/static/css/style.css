@@ -1,0 +1,238 @@
+/* layout */ 
+
+.grid-container {
+    display: grid;
+    gap: 1em;
+    grid-template-areas: 
+    "hd hd hd hd hd li"
+    "dn dn dn dn qd qd"
+    "dn dn dn dn qu qu"
+    "dn dn dn dn qu qu"
+    "dn dn dn dn qu qu"
+    "dn dn dn dn qu qu"
+    "dn dn dn dn qu qu"
+    "dn dn dn dn qu qu"
+}
+
+.box {
+    background-color: #8286A0;
+    color: white;
+    padding: .25em;
+    border-radius: 10px;
+    box-shadow: 3px 5px rgba(67, 73, 108, 1);
+}
+
+.li {
+    grid-area: li;
+    display: flex;
+    justify-content: center;
+    align-items: center;  
+}
+ 
+.hd {
+    grid-area: hd;
+    display: grid;
+    grid-template-columns: 5fr 1fr;
+}
+
+.dn {
+    grid-area: dn;
+}
+
+.qd {
+    grid-area: qd;
+}
+
+.bb {
+    display: flex;
+    padding: 1em;
+    justify-content: space-around;
+}
+
+.bb > button {
+    margin: .5em;
+}
+
+.qu {
+    grid-area: qu;
+}
+
+@media only screen and (max-width: 700px) {
+    .grid-container {
+        grid-template-areas: 
+        "hd"
+        "li"
+        "qd"
+        "dn"
+        "qu"        
+    }
+
+    .bb {
+        flex-direction: column;
+        justify-content: space-around;
+        padding: 1em;
+    }
+
+    .bb > button {
+        margin: .5em;
+    }
+
+    .li > button {
+        width: 100%;
+        margin: 1em;
+    }
+}
+
+/* general styles */
+
+body {
+    background-color: rgba(34, 31, 42, 0.966);
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: "Press Start 2P";
+    color: white;
+    padding: 0 0 0 8px;
+}
+
+#lookup > h2 {
+    padding: 0;
+}
+
+button {
+    font-family: "Press Start 2P";
+    background-color: rgba(80, 65, 108, .85);
+    color: white;
+    font-size: 1.25em;
+    padding: 8px;
+    border: 5px solid transparent;
+    outline: 0;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: white;
+    color: rgba(80, 65, 108, .85);
+    border: 5px solid rgba(80, 65, 108, .85);
+}
+
+button:active {
+    background-color: rgba( 40, 25, 69,1);
+    color: white;
+    border: 5px solid white;
+}
+
+input[type=submit] {
+    font-family: "Press Start 2P";
+    background-color: rgba(80, 65, 108, .85);
+    color: white;
+    font-size: 1.25em;
+    padding: 8px;
+    border: 5px solid transparent;
+    outline: 0;
+    cursor: pointer;
+}
+
+input[type=submit]:hover {
+    background-color: white;
+    color: rgba(80, 65, 108, .85);
+    border: 5px solid rgba(80, 65, 108, .85);    
+}
+
+input[type=submit]:active {
+    background-color: rgba( 40, 25, 69,1);
+    color: white;
+    border: 5px solid white;
+}
+
+
+input[type=text], input[type=password] {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    font-family: "PT Sans";
+    font-size: 1.25em;
+  }
+
+input[type=search] {
+    width: 100%;
+    padding: 5px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    font-family: "PT Sans";
+    font-size: 1.5em;
+}
+
+.login {
+    align-self: center;
+    justify-self: center;
+}
+
+.donadmin, .playqu {
+    padding: .5em;
+}
+
+/* login modal */
+
+.logmodal {
+    position: fixed;
+    font-family: "PT Sans";
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: rgba(0 , 0, 0, .85);
+    z-index: 99999;
+    opacity: 0;
+    transition: opacity 400ms ease-in;
+    pointer-events: none;
+}
+
+.logmodal:target {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.logmodal > div {
+    width: 400px;
+    position: relative;
+    margin: 10% auto;
+    padding: 5px 20px 13px 20px;
+    border-radius: 10px;
+    background: #8286A0;
+    color: white;
+}
+
+#un, #pw {
+    font-family: "PT Sans";
+    font-size: 1.5em;
+}
+
+
+
+.close {
+	background: #606061;
+	color: #FFFFFF;
+	line-height: 25px;
+	position: absolute;
+	right: -12px;
+	text-align: center;
+	top: -10px;
+	width: 24px;
+	text-decoration: none;
+	font-weight: bold;
+	border-radius: 12px;
+	box-shadow: 1px 1px 3px #000;
+}
+
+.close:hover { background: #00d9ff; }
+
+fieldset {
+    border: none;
+}
+
