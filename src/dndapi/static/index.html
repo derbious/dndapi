@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" ng-app>
+<html lang="en" ng-app="dnd">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css?family=PT+Sans|Press+Start+2P&display=swap" rel="stylesheet">
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.8/angular.min.js"></script>
+    <script src="js/dndonations.js"></script>
     <title>DnDonations Management Console</title>
 </head>
 
@@ -18,8 +19,16 @@
             
             
         </div>
-        <!-- this button needs to call the #lm modal -->
-        <div class="box li"><button id="login-button">Log In</button></div>
+        <div class="box li">
+            <!-- <h2>Login</h2>
+            <form novalidate>
+                <label>Username: <input type="text" ng-model="user.username"/></label><br/>
+                <label>Password: <input type="password" ng-model="user.password"/></label><br/>
+                <input type="submit" ng-click="doLogin(user)" value="Login" />
+            </form>
+            <div>{{ user | json }}</div>
+            <div>{{ apitoken }}</div> -->
+          </div>
 
         <div class="box qd">
             <h2>Quick Donate</h2>
@@ -56,12 +65,19 @@
     <a href="#lm">click to test login modal</a>
 
     <!-- login modal -->
-    <div id="lm" class="logmodal">
+    <div id="lm" class="logmodal" ng-controller="LoginController">
             <div>
                 <a href="#close" title="Close" class="close">X</a>
                 <h2>Please Log In</h2>
                 <fieldset>
-                    <form action="#" method="POST">
+                        <form novalidate>
+                                <label>Username: <input type="text" ng-model="user.username"/></label><br/>
+                                <label>Password: <input type="password" ng-model="user.password"/></label><br/>
+                                <input type="submit" ng-click="doLogin(user)" value="Login" />
+                            </form>
+                            <div>{{ user | json }}</div>
+                            <div>{{ apitoken }}</div>
+                    <!-- <form action="#" method="POST">
                         <p>
                             <label id="un" for="username">Username</label>
                             <input type="text" id="username" name="user_name" required>
@@ -71,7 +87,7 @@
                             <input type="password" id="pwd" name="password" required>
                         </p>
                         <input type="submit" style="display: none" />
-                    </form>
+                    </form> -->
                 </fieldset>
                 
             </div>
@@ -81,3 +97,63 @@
     
 </body>
 </html>
+
+<!-- <div class="container" ng-controller="SearchController" ng-show="display">
+      <h2>Donor Search</h2>
+      <form novalidate>
+        <input type="text" ng-model="query"/>
+        <input type="submit" ng-click="performSearch(query)" value="Search">
+      </form>
+      <table ng-show="display">
+        <tr ng-repeat="d in donor_results">
+          <td ng-click="showDonor(d.id)">{{ d.first_name }}</td>
+          <td>{{ d.last_name }}</td>
+          <td>{{ d.email_address }}</td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="container" ng-controller="NewDonorController" ng-show="display">
+      <h2>New Donor</h2>
+      <form novalidate>
+        <label>First Name: <input type="text" ng-model="donor.first_name"/></label><br />
+        <label>Last Name: <input type="text" ng-model="donor.last_name"/></label><br/>
+        <label>Physical Address: <input type="text" ng-model="donor.physical_address"/></label><br/>
+        <label>Email: <input type="text" ng-model="donor.email_address"/></label><br/>
+        <label>DCI Number: <input type="text" ng-model="donor.dci_number"/></label><br/>
+        <input type="submit" ng-click="addDonor(donor)" value="Submit" />
+      </form>
+      <div>{{donor | json}}</div>
+      <div>{{error_msg}}</div>
+    </div>
+
+    <div class="container" ng-controller="DonorController" ng-show="display">
+      <h2>View Donor</h2>
+      <div>First name: {{donor.first_name}}</div>
+      <div>Last name: {{donor.last_name}}</div>
+      <div>Email: {{donor.email_address}}</div>
+      <div>Physical Address: {{donor.physical_address}}</div>
+      <div>DCI: {{donor.dci_number}}</div>
+      <div>Availabe Gold: {{donor.balance}}</div>
+      <input type="submit" ng-click="showDonationForm()" value="Add Donation"/>
+      <div ng-show="nd_display">
+          <label>Amount: <input type="text" ng-model="donation.amount"/></label><br/>
+          <label>Type: <input type="text" ng-model="donation.method"/></label><br/>
+          <input type="submit" ng-click="addDonation()" value="Submit" />
+      </div>
+      <div>{{error_msg}}</div>
+    </div>
+
+    <div class="container" ng-controller="NewCharacterController" ng-show="display">
+        <h2>New Character</h2>
+
+        <form novalidate>
+          <label>Character: <input type="text" ng-model="character.name"/></label><br/>
+          <label>Race: <input type="password" ng-model="user.password"/></label><br/>
+          <label>Class: <input type="password" ng-model="user.password"/></label><br/>
+          <label>Account paying registration: <input type="password" ng-model="user.password"/></label><br/>
+          <input type="submit" ng-click="doLogin(user)" value="Login" />
+      </form>
+      <div>{{ user | json }}</div>
+      <div>{{ apitoken }}</div>
+    </div> -->
