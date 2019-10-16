@@ -4,8 +4,8 @@
     display: grid;
     gap: 1em;
     grid-template-areas: 
-    "hd hd hd hd hd hd"
-    "dn dn dn dn bb bb"
+    "hd hd hd hd hd li"
+    "dn dn dn dn qd qd"
     "dn dn dn dn qu qu"
 }
 
@@ -15,6 +15,13 @@
     padding: .25em;
     border-radius: 10px;
     box-shadow: 3px 5px rgba(67, 73, 108, 1);
+}
+
+.li {
+    grid-area: li;
+    display: flex;
+    justify-content: center;
+    align-items: center;  
 }
  
 .hd {
@@ -27,8 +34,11 @@
     grid-area: dn;
 }
 
+.qd {
+    grid-area: qd;
+}
+
 .bb {
-    grid-area: bb;
     display: flex;
     padding: 1em;
     justify-content: space-around;
@@ -42,9 +52,25 @@
     .grid-container {
         grid-template-areas: 
         "hd"
-        "bb"
+        "li"
+        "qd"
         "dn"
         "qu"        
+    }
+
+    .bb {
+        flex-direction: column;
+        justify-content: space-around;
+        padding: 1em;
+    }
+
+    .bb > button {
+        margin: .5em;
+    }
+
+    .li > button {
+        width: 100%;
+        margin: 1em;
     }
 }
 
