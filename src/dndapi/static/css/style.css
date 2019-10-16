@@ -7,6 +7,11 @@
     "hd hd hd hd hd li"
     "dn dn dn dn qd qd"
     "dn dn dn dn qu qu"
+    "dn dn dn dn qu qu"
+    "dn dn dn dn qu qu"
+    "dn dn dn dn qu qu"
+    "dn dn dn dn qu qu"
+    "dn dn dn dn qu qu"
 }
 
 .box {
@@ -42,6 +47,10 @@
     display: flex;
     padding: 1em;
     justify-content: space-around;
+}
+
+.bb > button {
+    margin: .5em;
 }
 
 .qu {
