@@ -28,41 +28,65 @@ dndApp.controller('LoginController', ['$rootScope', '$scope', '$http', function(
 }]);
 
 // The Search Controller handles the donor search.
-dndApp.controller('SearchController', ['$rootScope', '$scope', '$http', function($rootScope, $scope, $http) {
-    $scope.donor_results = [];
-    $scope.display = false;
+//dndApp.controller('SearchController', ['$rootScope', '$scope', '$http', function($rootScope, $scope, $http) {
+//    $scope.donor_results = [];
+//    $scope.display = false;
+//
+//    $scope.performSearch = function(query){
+//        var token = sessionStorage.getItem('access_token');
+//        console.log('Looking up donors');
+//        $http({
+//            method: 'GET',
+//            url: "api/search?q="+query,
+//            headers: {
+//                'Content-Type': 'application/json',
+//                'Authorization': "JWT "+token
+//            }
+//        }).then(function successCallback(response) {
+//            console.log('Success /api/search');
+//            $scope.donor_results = response.data;
+//            $scope.display = true;
+//        }, function errorCallback(response) {
+//            $scope.display = false;
+//        });
+//    }
+//
+//    //Signal that we should show this donor info
+//    $scope.showDonor = function(donor_id){
+//        console.log('in showDonor()');
+//        console.log(donor_id);
+//        $rootScope.$emit('show_donor', {"id": donor_id});
+//    };
+//}]);
 
-    // Start displaying after login
-    $rootScope.$on('login_successful', function(){
-        $scope.display = true;
-    });
+// New dynamic search
+dndApp.controller('ViewDonorController', ['$scope', '$http', function($scope, $http) {
+    $scope.donors = [];
+    $scope.current_donor = null;
 
-    $scope.performSearch = function(query){
+    $scope.refreshDonors = function(){
         var token = sessionStorage.getItem('access_token');
-        console.log('Looking up donors');
+        console.log('Refreshing all donor stuff');
         $http({
             method: 'GET',
-            url: "api/search?q="+query,
+            url: "api/donors",
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': "JWT "+token
             }
         }).then(function successCallback(response) {
-            console.log('Success /api/search');
-            $scope.donor_results = response.data;
-            $scope.display = true;
-        }, function errorCallback(response) {
-            $scope.display = false;
+            $scope.donors = response.data;
         });
     }
 
-    //Signal that we should show this donor info
-    $scope.showDonor = function(donor_id){
-        console.log('in showDonor()');
-        console.log(donor_id);
-        $rootScope.$emit('show_donor', {"id": donor_id});
-    };
+    // Set the current donor to the one with the correct donor id
+    $scope.showDonor = function(did){
+        $scope.current_donor = $scope.donors.find(function(d){
+            return d.id === did;
+        });
+    }
 }]);
+
 
 // The Add Donor controller.
 dndApp.controller('NewDonorController', ['$rootScope', '$scope', '$http', function($rootScope, $scope, $http) {
@@ -104,10 +128,6 @@ dndApp.controller('DonorController', ['$rootScope', '$scope', '$http', function(
     $scope.donor = {}
     $scope.donation = {}
 
-    $rootScope.$on('login_successful', function(){
-        $scope.display = true;
-    });  
-
     // Given the current donor.id, refresh the information
     $scope.refreshDonorInfo = function(){
         var token = sessionStorage.getItem('access_token');
@@ -133,6 +153,7 @@ dndApp.controller('DonorController', ['$rootScope', '$scope', '$http', function(
     });
 
     $scope.showDonationForm = function(){
+        console.log('displaying the nd form');
         $scope.nd_display = true;
         $scope.donation = {};
     };

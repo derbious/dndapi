@@ -4,3 +4,4 @@ gcs_creds.json
 */.pytest_cache
 colors.css
 colors2.css
+*.swp
