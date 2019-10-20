@@ -99,7 +99,7 @@ dndApp.controller('ViewDonorController', ['$scope', '$http', function($scope, $h
             //Refresh the donor Gold count
             $scope.refreshCurrentDonor();
         }, function errorCallback(response) {
-            $scope.nd_error_msg = "Could not post donation";
+            $scope.error_msg = "Could not post donation";
         });
     };
 
@@ -126,7 +126,34 @@ dndApp.controller('ViewDonorController', ['$scope', '$http', function($scope, $h
             console.log('Successful call to /api/characters [POST]');
             $scope.refreshCurrentDonor();
         }, function errorCallback(response) {
-            $scope.nd_error_msg = "Could not post donation";
+            $scope.error_msg = "Could not post donation";
+        });
+    };
+
+    $scope.addPurchase = function(reason){
+        var token = sessionStorage.getItem('access_token');
+        console.log('Adding a Boon/Bane purchase');
+        
+        // Create the purchase object
+        var p = {
+            "donor_id": $scope.current_donor.id,
+            "reason": reason,
+            "amount": 5
+        }
+        $http({
+            method: 'POST',
+            url: "api/purchases/",
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': "JWT "+token
+            },
+            data: p
+        }).then(function successCallback(response) {
+            console.log('Successful call to /api/purchases [POST]');
+            //Refresh the donor Gold count
+            $scope.refreshCurrentDonor();
+        }, function errorCallback(response) {
+            $scope.error_msg = "Could not post purchase";
         });
     };
 }]);

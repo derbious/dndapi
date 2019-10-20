@@ -100,10 +100,16 @@
                     <!-- add boon -->
                     <div ng-switch-when="addboon">
                         <h4>purchase boon</h4>
+                        <form novalidate ng-submit="addPurchase('boon')">
+                            <label>Do it? <input type="submit" value="yes"/></label>
+                        </form>
                     </div>
                     <!-- add bane -->
                     <div ng-switch-when="addbane">
                         <h4>purchase bane</h4>
+                        <form novalidate ng-submit="addPurchase('bane')">
+                            <label>Do it? <input type="submit" value="yes"/></label>
+                        </form>
                     </div>
 
                 </div>

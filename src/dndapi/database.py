@@ -221,7 +221,7 @@ def insert_donation(amount, method, donor_id):
 def insert_purchase(amount, reason, donor_id):
     with sqlite3.connect(DATABASE_LOCATION) as dbconn:
         c = dbconn.cursor()
-        c.execute("""INSERT INTO purchases(amount, timestamp, reason, donor_id) values(?,?,?,?,?)""", 
+        c.execute("""INSERT INTO purchases(amount, timestamp, reason, donor_id) values(?,?,?,?)""", 
                   [amount, datetime.now(), reason, donor_id])
         c.execute("""SELECT * FROM purchases WHERE rowid=?;""", (c.lastrowid,))
         row = c.fetchone()
