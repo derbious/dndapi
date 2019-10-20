@@ -54,9 +54,7 @@ def validate_new_character_post(js):
     if ('name' in js and
             'race' in js and
             'char_class' in js and
-            'fee_type' in js and
-            'player_id' in js and
-            js['player_id'].isdigit()):
+            'player_id' in js):
         return True
     else:
         return False

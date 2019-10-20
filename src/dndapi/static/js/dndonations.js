@@ -27,42 +27,14 @@ dndApp.controller('LoginController', ['$rootScope', '$scope', '$http', function(
     }
 }]);
 
-// The Search Controller handles the donor search.
-//dndApp.controller('SearchController', ['$rootScope', '$scope', '$http', function($rootScope, $scope, $http) {
-//    $scope.donor_results = [];
-//    $scope.display = false;
-//
-//    $scope.performSearch = function(query){
-//        var token = sessionStorage.getItem('access_token');
-//        console.log('Looking up donors');
-//        $http({
-//            method: 'GET',
-//            url: "api/search?q="+query,
-//            headers: {
-//                'Content-Type': 'application/json',
-//                'Authorization': "JWT "+token
-//            }
-//        }).then(function successCallback(response) {
-//            console.log('Success /api/search');
-//            $scope.donor_results = response.data;
-//            $scope.display = true;
-//        }, function errorCallback(response) {
-//            $scope.display = false;
-//        });
-//    }
-//
-//    //Signal that we should show this donor info
-//    $scope.showDonor = function(donor_id){
-//        console.log('in showDonor()');
-//        console.log(donor_id);
-//        $rootScope.$emit('show_donor', {"id": donor_id});
-//    };
-//}]);
 
-// New dynamic search
+// View Donor Controller
 dndApp.controller('ViewDonorController', ['$scope', '$http', function($scope, $http) {
     $scope.donors = [];
     $scope.current_donor = null;
+    $scope.panel = "";
+    $scope.nd = {'method': 'cash'};
+    $scope.character = {};
 
     $scope.refreshDonors = function(){
         var token = sessionStorage.getItem('access_token');
@@ -85,6 +57,78 @@ dndApp.controller('ViewDonorController', ['$scope', '$http', function($scope, $h
             return d.id === did;
         });
     }
+
+    // Given the current donor.id, refresh the information
+    $scope.refreshCurrentDonor = function(){
+        var token = sessionStorage.getItem('access_token');
+        $http({
+            method: 'GET',
+            url: "api/donors/"+$scope.current_donor.id,
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': "JWT "+token
+            }
+        }).then(function successCallback(response) {
+            console.log('Successful call to /api/donors [GET]');
+            $scope.current_donor = response.data;
+        }, function errorCallback(response) {
+            $scope.error_msg = "Could not get donor";
+        });
+    };
+
+    $scope.addDonation = function(){
+        var token = sessionStorage.getItem('access_token');
+        console.log('Adding a donation');
+        
+        // Create the dontaion object
+        var d = {
+            "donor_id": $scope.current_donor.id,
+            "amount": $scope.nd.amount,
+            "method": $scope.nd.method
+        }
+        $http({
+            method: 'POST',
+            url: "api/donations/",
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': "JWT "+token
+            },
+            data: d
+        }).then(function successCallback(response) {
+            console.log('Successful call to /api/donations [POST]');
+            //Refresh the donor Gold count
+            $scope.refreshCurrentDonor();
+        }, function errorCallback(response) {
+            $scope.nd_error_msg = "Could not post donation";
+        });
+    };
+
+    $scope.createCharacter = function() {
+        console.log('Creating character stub');
+        var token = sessionStorage.getItem('access_token');
+        
+        // Create the character obj
+        var d = {
+            "player_id": $scope.current_donor.id,
+            "name": $scope.character.name,
+            "race": $scope.character.race,
+            "char_class": $scope.character.char_class
+        }
+        $http({
+            method: 'POST',
+            url: "api/characters/",
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': "JWT "+token
+            },
+            data: d
+        }).then(function successCallback(response) {
+            console.log('Successful call to /api/characters [POST]');
+            $scope.refreshCurrentDonor();
+        }, function errorCallback(response) {
+            $scope.nd_error_msg = "Could not post donation";
+        });
+    };
 }]);
 
 
@@ -119,71 +163,3 @@ dndApp.controller('NewDonorController', ['$rootScope', '$scope', '$http', functi
 }]);
 
 
-// The Donor controller.
-dndApp.controller('DonorController', ['$rootScope', '$scope', '$http', function($rootScope, $scope, $http) {
-    $scope.display = false;
-    $scope.nd_display = false;
-    $scope.error_msg = "";
-    $scope.nd_error_msg = "";
-    $scope.donor = {}
-    $scope.donation = {}
-
-    // Given the current donor.id, refresh the information
-    $scope.refreshDonorInfo = function(){
-        var token = sessionStorage.getItem('access_token');
-        $http({
-            method: 'GET',
-            url: "api/donors/"+$scope.donor.id,
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': "JWT "+token
-            }
-        }).then(function successCallback(response) {
-            console.log('Successful call to /api/donors [GET]');
-            $scope.donor = response.data;
-        }, function errorCallback(response) {
-            $scope.error_msg = "Could not get donor";
-        });
-    }
-
-
-    $rootScope.$on('show_donor', function(e, d){
-        $scope.donor.id = d.id;
-        $scope.refreshDonorInfo();
-    });
-
-    $scope.showDonationForm = function(){
-        console.log('displaying the nd form');
-        $scope.nd_display = true;
-        $scope.donation = {};
-    };
-
-    $scope.addDonation = function(){
-        var token = sessionStorage.getItem('access_token');
-        console.log('Adding a donation');
-        
-        // Create the dontaion object
-        var d = {
-            "donor_id": $scope.donor.id,
-            "amount": $scope.donation.amount,
-            "method": $scope.donation.method
-        }
-        $http({
-            method: 'POST',
-            url: "api/donations/",
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': "JWT "+token
-            },
-            data: d
-        }).then(function successCallback(response) {
-            console.log('Successful call to /api/donations [POST]');
-            $scope.nd_display = false; // Hide the donation modal
-            //Refresh the donor Gold count
-            $scope.refreshDonorInfo();
-        }, function errorCallback(response) {
-            $scope.nd_error_msg = "Could not post donation";
-        });
-    };
-
-}]);

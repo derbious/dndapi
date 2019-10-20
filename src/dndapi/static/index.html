@@ -24,7 +24,7 @@
             <div id="lookup">
                 <h3>Donor Lookup</h3>
                 <input type="text" ng-model="query" ng-focus="refreshDonors()"/>
-                <table>
+                <table ng-show="query.length >= 3">
                     <tr ng-repeat="d in donors | filter:query | limitTo: 5" ng-click="showDonor(d.id)">
                         <td>{{ d.first_name }}</td>
                         <td>{{ d.last_name }}</td>
@@ -42,16 +42,70 @@
                 <div>Email: {{current_donor.email_address}}</div>
                 <div>Physical Address: {{current_donor.physical_address}}</div>
                 <div>DCI: {{current_donor.dci_number}}</div>
-                <div>Availabe Gold: {{current_donor.balance}}</div>
-                <button ng-click="addgold_display = true">Add Gold</button><button>Add Character</button><br>
-                <button>Purchase Boon</button><button>Purchase Bane</button>
-                <!-- Add Gold div -->
-                <div ng-show="addgold_display">
-                    <form ng-submit="addDonation()">
-                        <label>Amount: <input type="text" ng-model="nd.amount"/></label><br/>
-                        <label>Type: <input type="text" ng-model="nd.method"/></label><br/>
-                        <input type="submit" value="Submit" />
-                    </form>
+                <div>Total Donations: {{current_donor.total_donations}}</div>
+                <div>Availabe Gold: {{current_donor.available_gold}}</div>
+                <button ng-click="panel='addgold'">Add Gold</button>
+                <button ng-click="panel='addchar'">Add Character</button><br>
+                <button ng-click="panel='addboon'" ng-disabled="current_donor.available_gold < 5.0">Purchase Boon</button>
+                <button ng-click="panel='addbane'">Purchase Bane</button>
+
+                <!-- This div's content is swapped out -->
+                <div ng-switch on="panel">
+                    <!-- add Gold panel-->
+                    <div ng-switch-when="addgold">
+                        <form ng-submit="addDonation()">
+                            <label>Amount: <input type="text" ng-model="nd.amount"/></label><br/>
+                            <label>Method: 
+                                <select ng-model="nd.method">
+                                    <option value="cash" default>Cash</option>
+                                    <option value="online">Online</option>
+                                </select></label><br/>
+                            <input type="submit" value="Submit" />
+                        </form>
+                    </div>
+                    <!-- add char -->
+                    <div ng-switch-when="addchar">
+                        <h4>add char</h4>
+                        <form novalidate ng-submit="createCharacter()">
+                          <label>Character Name: <input type="text" ng-model="character.name"/></label><br/>
+                          <label>Race:<select ng-model="character.race">
+                              <option selected>Dragonborn</option>
+                              <option>Drow</option>
+                              <option>Dwarf</option>
+                              <option>Elf</option>
+                              <option>Gnome</option>
+                              <option>Half-Elf</option>
+                              <option>Half-Orc</option>
+                              <option>Halfling</option>
+                              <option>Human</option>
+                              <option>Tiefling</option>
+                          </select></label>
+                          <label>Character Class<select ng-model="character.char_class">
+                              <option selected>Barbarian</option>
+                              <option>Bard</option>
+                              <option>Cleric</option>
+                              <option>Druid</option>
+                              <option>Fighter</option>
+                              <option>Monk</option>
+                              <option>Paladin</option>
+                              <option>Ranger</option>
+                              <option>Rogue</option>
+                              <option>Sorcerer</option>
+                              <option>Warlock</option>
+                              <option>Wizard</option>
+                          </select>
+                          <input type="submit" value="Create"/>
+                        </form>
+                    </div>
+                    <!-- add boon -->
+                    <div ng-switch-when="addboon">
+                        <h4>purchase boon</h4>
+                    </div>
+                    <!-- add bane -->
+                    <div ng-switch-when="addbane">
+                        <h4>purchase bane</h4>
+                    </div>
+
                 </div>
             </div>
             <div>{{error_msg}}</div>
@@ -73,8 +127,6 @@
                 <label>DCI Number: <input type="text" ng-model="donor.dci_number"/></label><br/>
                 <input type="submit" value="Submit" />
             </form>
-            <div>{{donor | json}}</div>
-            <div>{{error_msg}}</div>
         </div>
     </div>
 
@@ -99,24 +151,6 @@
 </html>
 
 <!--
-
-    <div class="container" ng-controller="DonorController" ng-show="display">
-      <h2>View Donor</h2>
-      <div>First name: {{donor.first_name}}</div>
-      <div>Last name: {{donor.last_name}}</div>
-      <div>Email: {{donor.email_address}}</div>
-      <div>Physical Address: {{donor.physical_address}}</div>
-      <div>DCI: {{donor.dci_number}}</div>
-      <div>Availabe Gold: {{donor.balance}}</div>
-      <input type="submit" ng-click="showDonationForm()" value="Add Donation"/>
-      <div ng-show="nd_display">
-          <label>Amount: <input type="text" ng-model="donation.amount"/></label><br/>
-          <label>Type: <input type="text" ng-model="donation.method"/></label><br/>
-          <input type="submit" ng-click="addDonation()" value="Submit" />
-      </div>
-      <div>{{error_msg}}</div>
-    </div>
-
     <div class="container" ng-controller="NewCharacterController" ng-show="display">
         <h2>New Character</h2>
 

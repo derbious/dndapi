@@ -79,8 +79,20 @@ def get_donor_by_id(donor_id):
     with sqlite3.connect(DATABASE_LOCATION) as dbconn:
         c = dbconn.cursor()
         app.logger.info('before querty')
-        c.execute('SELECT * FROM donors WHERE id=?', (donor_id,) )
-        app.logger.info('before fetchone')
+        c.execute("""
+        SELECT
+          donors.id,
+          donors.first_name,
+          donors.last_name,
+          donors.physical_address,
+          donors.dci_number,
+          donors.email_address,
+          coalesce(don.amt, 0) as total_donations,
+          coalesce(don.amt, 0)-coalesce(pur.pamt, 0) as available_gold
+        FROM donors
+        LEFT JOIN (SELECT donor_id, sum(amount) as amt FROM donations GROUP BY donor_id) as don ON donors.id = don.donor_id
+        LEFT JOIN (SELECT donor_id, sum(amount) as pamt FROM purchases GROUP BY donor_id) as pur ON donors.id = pur.donor_id
+        WHERE donors.id = ?""", [donor_id,])
         row = c.fetchone()
         app.logger.info('after fetchone')
         result = {}
@@ -91,14 +103,9 @@ def get_donor_by_id(donor_id):
                     'last_name': row[2],
                     'physical_address': row[3],
                     'dci_number': row[4],
-                    'email_address': row[5] }
-
-            # This query gets their account balance
-            c.execute("""SELECT donsum-pursum FROM 
-                (SELECT COALESCE(SUM(amount),0) as donsum FROM donations WHERE donor_id=?) as a,
-                (SELECT COALESCE(SUM(amount),0) as pursum FROM purchases WHERE donor_id=?) as b;""", [donor_id,donor_id])
-            dsrow = c.fetchone()
-            result['balance'] = dsrow[0]/100.0
+                    'email_address': row[5],
+                    'total_donations': row[6]/100.0,
+                    'available_gold': row[7]/100.0 }
             return result
         else:
             app.logger.info('No rows found')
@@ -108,14 +115,29 @@ def get_donor_by_id(donor_id):
 def get_all_donors():   
     with sqlite3.connect(DATABASE_LOCATION) as dbconn:
         c = dbconn.cursor()
-        c.execute('SELECT * FROM donors')
+        c.execute("""
+        select
+            donors.id,
+            donors.first_name,
+            donors.last_name,
+            donors.physical_address,
+            donors.dci_number,
+            donors.email_address,
+            coalesce(don.amt, 0) as total_donations,
+            coalesce(don.amt, 0)-coalesce(pur.pamt, 0) as available_gold
+        FROM donors
+        LEFT JOIN (SELECT donor_id, sum(amount) as amt FROM donations GROUP BY donor_id) as don ON donors.id = don.donor_id
+        LEFT JOIN (SELECT donor_id, sum(amount) as pamt FROM purchases GROUP BY donor_id) as pur ON donors.id = pur.donor_id;
+        """)
         rows = c.fetchall()
         res = [ {'id': row[0],
            'first_name': row[1],
            'last_name': row[2],
            'physical_address': row[3],
            'dci_number': row[4],
-           'email_address': row[5] } for row in rows ]
+           'email_address': row[5],
+           'total_donations': row[6]/100.0,
+           'available_gold': row[7]/100.0 } for row in rows ]
         return res
 
 # Inserts the donor information into the database
