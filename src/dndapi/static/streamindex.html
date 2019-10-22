@@ -13,7 +13,7 @@
 
 <body>
 
-    <div class="grid-container">
+    <div class="grid-container" ng-controller="StreamController">
         <div class="box hd"><h1>DnDonations Streaming Console</h1></div>
         <div class="box li">
             <a href="#lm">Login</a>
@@ -21,7 +21,110 @@
 
         <!-- Stream Ops -->
         <div class="box dn">
-            Fuck with the stream here
+            {{error_msg}}
+            <div>
+                <form >
+                    <input type="text" ng-model="stream_msg"></input>
+                </form>
+            </div>
+            <div>
+                <div>Current DM Name: {{current_dm.name}}</div>
+                <div>Team: {{current_dm.team}}</div>
+                <div>Kills: {{current_dm.numkills}}</div>                        
+                <form ng-submit="regNewDm()">
+                    <label>Name:<input type="text" ng-model="newdm.name"></input></label>
+                    <label>Team:
+                    <select ng-model="newdm.team">
+                      <option value="duskpatrol">Duskpatrol</option>
+                      <option value="moonwatch">Moonwatch</option>
+                      <option value="sunguard">Sunguard️</option>
+                    </select></label>
+                    <input type="submit" value="Submit" />
+                </form>
+            </div>
+            <div>
+                <table>
+                    <thead>
+                        <tr><th>Peril</th><th>Next Goal</th><th>Duskpatrol Kills</th><th>Moonwatch Kills</th><th>Sunguard Kills</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td id="perilLvl"></td>
+                            <td>
+                                <select id="nextGoal">
+                                    <option>$750</option>
+                                    <option>$1000</option>
+                                    <option>$1250</option>
+                                    <option>$1500</option>
+                                    <option>$2000</option>
+                                    <option>$2500</option>
+                                    <option>$3000</option>
+                                    <option>$4000</option>
+                                    <option>$5000</option>
+                                    <option>$7500</option>
+                                    <option>$10000</option>
+                                </select>
+                            </td>
+                            <td width="25%" id='duskpatrolKills'></td>
+                            <td width="25%" id='moonwatchKills'></td>
+                            <td width="25%" id='sunguardKills'></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+                
+            <div  style="margin-bottom: 8px;">
+                <table id="playingtable"  style="width:100%">
+                    // Needs to be filled in
+                </table>
+                
+                
+                <div id="resCharPage" class="modal-dialog"> 
+                      <div>
+                        <form  onsubmit="return false;">
+                          <fieldset>
+                            <input type="hidden" id="resCharId" value=''>
+                            <input id="resCharPaying" type="checkbox">
+                            <label for="resCharPaying">Paying for self?</label>
+                            <span id="resCharCost" >5</span>
+                            <select id="resPayForm" disabled>
+                              <option value="cash">Cash</option>
+                              <option value="online">Online</option>
+                            </select>
+                            <button type="cancel"  id="reschar-close">Cancel</button>
+                            <button type="submit"  id="reschar-save">Ok</button>
+                          </fieldset>
+                        </form>
+                      </div>
+                    </div>
+            
+        </div>
+
+        <div class="box aa">
+            <h2>Rendered results here</h2>
+            <div>Stream Message: {{stream_msg}}</div>
+            <div>NewDM JSON: {{newdm | json}}</div>
+            <div>{{queue | json }}</div>
+        </div>
+
+
+
+
+    </div>
+
+
+    <!-- login modal -->
+    <div id="lm" class="logmodal" ng-controller="LoginController">
+        <div>
+            <a href="#" title="Close" class="close">X</a>
+            <h2>Please Log In</h2>
+            <fieldset>
+                <form novalidate ng-submit="doLogin(user)">
+                    <label>Username: <input type="text" ng-model="user.username"/></label><br/>
+                    <label>Password: <input type="password" ng-model="user.password"/></label><br/>
+                    <input type="submit" value="Login" />
+                </form>
+            </fieldset>
         </div>
     </div>
 

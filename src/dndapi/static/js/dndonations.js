@@ -190,3 +190,62 @@ dndApp.controller('NewDonorController', ['$rootScope', '$scope', '$http', functi
 }]);
 
 
+// The Stream controller
+dndApp.controller('StreamController', ['$scope', '$http', '$interval', function($scope, $http, $interval) {
+    $scope.error_msg = "";
+    $scope.newdm = {
+        "name": "",
+        "team": "moonwatch"
+    };
+    $scope.current_dm = {
+        "name": "dmname",
+        "team": "team",
+        "kills": 0
+    };
+    $scope.queue = [];
+
+    // Setup the queue poller
+    $interval(function(){
+        console.log('polling queue...')
+        var token = sessionStorage.getItem('access_token');
+        $http({
+            method: 'GET',
+            url: "api/queue/",
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': "JWT "+token
+            }
+        }).then(function successCallback(response) {
+            console.log('Successful call to /api/queue [GET]');
+            $scope.queue = response.data
+        }, function errorCallback(response) {
+            $scope.error_msg = "Could not fetch queue";
+        });
+    }, 30*1000);
+    
+
+    $scope.regNewDm = function(){
+        var token = sessionStorage.getItem('access_token');
+        console.log('Registering New DM');
+        dm = {
+            "name": $scope.newdm.name,
+            "team": $scope.newdm.team
+        }
+        $http({
+            method: 'POST',
+            url: "api/dms",
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': "JWT "+token
+            },
+            data: dm
+        }).then(function successCallback(response) {
+            console.log('Successful call to /api/dms [POST]');
+            $scope.current_dm = response.data
+        }, function errorCallback(response) {
+            $scope.error_msg = "Could not insert DM";
+        });
+    }
+}]);
+
+

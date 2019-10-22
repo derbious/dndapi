@@ -305,10 +305,18 @@ def insert_character(name, race, clazz, state, player_id):
                 'player_id': row[6],
                 'start_time': row[7],
                 'end_time': row[8] }
+        # Also, add them to the end of the queue
+        app.logger.info(res)
+        c.execute("""SELECT max(position, 0) FROM queue""")
+        queuerow = c.fetchone()
+        if not queuerow:
+            newpos = 0
+        else:
+            newpos = queuerow[0] + 1 # Increment the new position
+        app.logger.info(newpos)
+        c.execute("""INSERT INTO queue (position, character_id) values(?,?)""",[newpos, res['id']])
         dbconn.commit()
         return res
-
-
 
 
 #################################################################################################
@@ -336,7 +344,16 @@ def insert_current_dm(name, team):
         c.execute("""UPDATE dms SET current = 0 WHERE current = 1;""")
         ## Add the new one
         c.execute("""INSERT INTO dms(name, team, current) values(?,?,?)""", [name, team, 1])
+        c.execute("""SELECT * FROM dms WHERE rowid=?;""", (c.lastrowid,))
+        row = c.fetchone()
+        res = { 'id': row[0],
+                'name': row[1],
+                'team': row[2],
+                'numkills': row[3],
+                'current': row[4],
+              }
         dbconn.commit()
+        return res
 
 def select_dm_teamkills():
     ## This query sums up all of the dmkills based on their team.
@@ -349,3 +366,21 @@ def select_dm_teamkills():
         for row in rows:
             result[row[0]] = row[1]
         return result
+
+
+###################################################################
+## Queue queries
+def select_waiting_queue():
+    with sqlite3.connect(DATABASE_LOCATION) as dbconn:
+        c = dbconn.cursor()
+        c.execute("""SELECT id, position, character_id FROM queue WHERE position >= 0 ORDER BY position ASC""")
+        rows = c.fetchall()
+        result = []
+        for row in rows:
+            result.append({
+                "id": row[0],
+                "positon": row[1],
+                "character_id": row[2]
+            })
+        return result
+

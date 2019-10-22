@@ -2,34 +2,30 @@ from dndapi import app
 from flask import request
 from flask_jwt import jwt_required, current_identity
 import json
+from jsonschema import validate
 
 import dndapi.auth as auth
 import dndapi.database as database
 
-def to_json(dm):
-    jso = {
-        'id': dm['id'],
-        'name': dm['name'],
-        'team': dm['team'],
-        'numkills': dm['numkills'],
-        'current': dm['current']
+## This is json-schema for validation
+DM_SCHEMA = {
+    "type": "object",
+    "required": [
+        "name",
+        "team"
+    ],
+    "properties": {
+        "name": {"type" : "string"},
+        "team": {"type" : "string"}
     }
-    return json.dumps(jso)
-
-def validate_dms_post(js):
-    # Need {name: "", team=""}
-    if ('name' in js and 
-          'team' in js):
-        return True
-    else:
-        return False
+}
 
 @app.route('/api/currentdm', methods=['GET',])
 @jwt_required()
 def get_currentdm():
     dm = database.get_current_dm()
     if dm:
-        return to_json(dm), 200, {'Content-Type': 'application/json; charset=utf-8'}
+        return json.dumps(dm), 200, {'Content-Type': 'application/json; charset=utf-8'}
     else:
         return '', 404
 
@@ -41,11 +37,15 @@ def post_dm():
         return '', 401
     # pull the posted information from json and validate it
     json_data = request.get_json()
-    if not json_data or not validate_dms_post(json_data):
-        return '', 400
-    else:
-        database.insert_current_dm(json_data['name'], json_data['team'])
-        return '{\"status\", \"ok\"}', 201, {'Content-Type': 'application/json; charset=utf-8'}
+    app.logger.info('entering post_dm()')
+    app.logger.info(json_data)
+    try:
+        validate(json_data, DM_SCHEMA)
+        newdm = database.insert_current_dm(json_data['name'], json_data['team'])
+        return json.dumps(newdm), 201, {'Content-Type': 'application/json; charset=utf-8'}
+    except Exception as e:
+        app.logger.info(e)
+        return '{\"status\", \"error\"}', 400, {'Content-Type': 'application/json; charset=utf-8'}
 
 
 @app.route('/api/dmteamkills', methods=['GET',])
