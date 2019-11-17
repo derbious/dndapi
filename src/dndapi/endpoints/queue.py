@@ -18,56 +18,56 @@ def validate_reorderqueue_post(js):
 @app.route('/api/queue/', methods=['GET',])
 @jwt_required()
 def queue():
-    playingqueue = []
-    waitingqueue = []
-    rq = database.select_waiting_queue()
-    return json.dumps(rq), 200, {'Content-Type': 'application/json; charset=utf-8'}
-    # # Populate the playing queue
-    # playingqueue_key = datastore_client.key('Playerqueue', 'playing')
-    # pq = datastore_client.get(key=playingqueue_key)
-    # for charname in pq['queue']:
-    #     # Blank charnames = empty seats
-    #     if charname == '':
-    #         playingqueue.append(None)
-    #     else:
-    #         cq = datastore_client.query(kind='Character')
-    #         cq.add_filter('name', '=', charname)
-    #         #app.logger.info(cq.fetch())
-    #         character = list(cq.fetch())[0]
-            
-    #         dk = datastore_client.key('Donor', int(character['donor_id']))
-    #         donor = datastore_client.get(dk)
-    #         playingqueue.append({
-    #             'id': character.id,
-    #             'name': character['name'],
-    #             'player_name': "%s %s"%(donor['firstname'], donor['lastname']),
-    #             'race': character['race'],
-    #             'class': character['class'],
-    #             'num_resses': character['num_resses'],
-    #             'starttime': character['starttime'].isoformat()
-    #         })
+    # Store the playing queue in a list of 6
+    playing = [None, None, None, None, None, None]
+    for p in database.select_queue('playing'):
+        app.logger.info(p)
+        playing[p['q_pos']-1] = p
+    waiting = database.select_queue('queued')
+    app.logger.info(waiting)
+    res = {
+        'playing': playing,
+        'waiting': waiting
+    }
+    return json.dumps(res), 200, {'Content-Type': 'application/json; charset=utf-8'}
 
-    # # Populate the waiting queue
-    # waitingqueue_key = datastore_client.key('Playerqueue', 'waiting')
-    # wq = datastore_client.get(key=waitingqueue_key)
-    # for charname in wq['queue']:
-    #     #Look up the peeps
-    #     cq = datastore_client.query(kind='Character')
-    #     cq.add_filter('name', '=', charname)
-    #     character = list(cq.fetch())[0]
-        
-    #     dk = datastore_client.key('Donor', int(character['donor_id']))
-    #     donor = datastore_client.get(dk)
-    #     waitingqueue.append({
-    #         'id': character.id,
-    #         'name': character['name'],
-    #         'player_name': "%s %s"%(donor['firstname'], donor['lastname'])
-    #     })
-    # rq = {
-    #     'waiting': waitingqueue,
-    #     'playing': playingqueue,
-    # }
-    
+
+# The /queue/remove/ endpoint removes a player from the queue
+@app.route('/api/queue/remove/<int:character_id>', methods=['POST'])
+@jwt_required()
+def queue_remove(character_id=None):
+    if not character_id:
+        return '',400
+    database.queue_remove(character_id)
+    return '{"status": "ok"}', 201
+
+# The /queue/unremove/ endpoint removes a player from the queue
+@app.route('/api/queue/unremove/<int:character_id>', methods=['POST'])
+@jwt_required()
+def queue_unremove(character_id=None):
+    if not character_id:
+        return '',400
+    database.queue_unremove(character_id)
+    return '{"status": "ok"}', 201
+
+# # The /api/queue/unremove/ endpoint places the character back in the queue
+# @app.route('/api/queue/unremove/<int:character_id>', methods=['POST'])
+# @jwt_required()
+# def queue_unremove(character_id=None):
+#     if not character_id:
+#         return '',400
+#     with datastore_client.transaction():
+#         characterkey = datastore_client.key('Character', character_id)
+#         character = datastore_client.get(characterkey)
+
+#         waitingqueue_key = datastore_client.key('Playerqueue', 'waiting')
+#         wq = datastore_client.get(key=waitingqueue_key)
+
+#         if character['name'] not in wq['queue'] and character['state'] == 'canceled':
+#             wq['queue'].append(character['name'])
+#             character['state'] = 'waiting'
+#             datastore_client.put_multi([character, wq])
+#     return '{"status": "ok"}', 201
 
 
 # The /queue/reorder endpoint

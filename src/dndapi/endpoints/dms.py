@@ -23,7 +23,9 @@ DM_SCHEMA = {
 @app.route('/api/currentdm', methods=['GET',])
 @jwt_required()
 def get_currentdm():
+    app.logger.info('in currentdm/')
     dm = database.get_current_dm()
+    app.logger.info('current_dm:', dm)
     if dm:
         return json.dumps(dm), 200, {'Content-Type': 'application/json; charset=utf-8'}
     else:

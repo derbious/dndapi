@@ -15,8 +15,23 @@
 
     <div class="grid-container">
         <div class="box hd"><h1>DnDonations Management Console</h1></div>
-        <div class="box li">
-            <a href="#lm">Login</a>
+        <div class="box li" ng-controller="LoginController">
+            <a href="" ng-click="show_modal = true;" ng-show="login_successful==false">Login</a>
+            <span ng-show="login_successful">Logged in 🌮</span>
+            <!-- login modal -->
+            <div id="lm" class="logmodal" ng-show="show_modal">
+                <div>
+                    <a href="" title="Close" class="close" ng-click="show_modal = false;">X</a>
+                    <h2>Please Log In</h2>
+                    <fieldset>
+                        <form novalidate ng-submit="doLogin(user)">
+                            <label>Username: <input type="text" ng-model="user.username"/></label><br/>
+                            <label>Password: <input type="password" ng-model="user.password"/></label><br/>
+                            <input type="submit" value="Login" />
+                        </form>
+                    </fieldset>
+                </div>
+            </div>
         </div>
 
         <!-- Donor Administration -->
@@ -24,8 +39,8 @@
             <div id="lookup">
                 <h3>Donor Lookup</h3>
                 <input type="text" ng-model="query" ng-focus="refreshDonors()"/>
-                <table ng-show="query.length >= 3">
-                    <tr ng-repeat="d in donors | filter:query | limitTo: 5" ng-click="showDonor(d.id)">
+                <table>
+                    <tr ng-repeat="d in donors | filter:query | limitTo: 10" ng-click="showDonor(d.id)">
                         <td>{{ d.first_name }}</td>
                         <td>{{ d.last_name }}</td>
                         <td>{{ d.email_address }}</td>
@@ -35,7 +50,7 @@
             </div>
 
             <!-- View Donor -->
-            <div id="results">
+            <div id="results" ng-show="current_donor != null">
                 <h3>Donor Information</h3>
                 <div>First name: {{current_donor.first_name}}</div>
                 <div>Last name: {{current_donor.last_name}}</div>
@@ -44,10 +59,19 @@
                 <div>DCI: {{current_donor.dci_number}}</div>
                 <div>Total Donations: {{current_donor.total_donations}}</div>
                 <div>Availabe Gold: {{current_donor.available_gold}}</div>
+                <div>Characters:
+                    <ul>
+                        <li ng-repeat="c in current_donor_characters">
+                            {{c.name}} {{c.race}} {{c.class}} {{c.state}}
+                            <button ng-show="c.state=='queued';" ng-click="removeFromQueue(c.id);">Remove from queue</button>
+                            <button ng-show="c.state=='removed';" ng-click="unremoveFromQueue(c.id);">Add back to queue</button>
+                        </li>
+                    </ul>
+                </div>
                 <button ng-click="panel='addgold'">Add Gold</button>
                 <button ng-click="panel='addchar'">Add Character</button><br>
                 <button ng-click="panel='addboon'" ng-disabled="current_donor.available_gold < 5.0">Purchase Boon</button>
-                <button ng-click="panel='addbane'">Purchase Bane</button>
+                <button ng-click="panel='addbane'" ng-disabled="current_donor.available_gold < 5.0">Purchase Bane</button>
 
                 <!-- This div's content is swapped out -->
                 <div ng-switch on="panel">
@@ -94,79 +118,69 @@
                               <option>Warlock</option>
                               <option>Wizard</option>
                           </select>
+                          <label>Benefactor:<select ng-model="character.benefactor">
+                              <option ng-repeat="donor in donors" value="{{donor.id}}" ng-if="donor.available_gold >= 5">{{donor.first_name}} {{donor.last_name}}</option>
+                          </select></label>
                           <input type="submit" value="Create"/>
                         </form>
                     </div>
                     <!-- add boon -->
                     <div ng-switch-when="addboon">
                         <h4>purchase boon</h4>
-                        <form novalidate ng-submit="addPurchase('boon')">
-                            <label>Do it? <input type="submit" value="yes"/></label>
+                        <form ng-submit="addPurchase('boon')">
+                            <label><input type="radio" ng-model="boonamt" value="5" name="boonamt">$5 (random draw)</label><br>
+                            <label><input type="radio" ng-model="boonamt" value="15" name="boonamt" ng-disabled="current_donor.available_gold < 15.0">$15 (Select from lower table)</label><br>
+                            <label><input type="radio" ng-model="boonamt" value="30" name="boonamt" ng-disabled="current_donor.available_gold < 30.0">$30 (Select from current table)</label><br>
+                            <input type="submit" value="purchase"/>
                         </form>
                     </div>
                     <!-- add bane -->
                     <div ng-switch-when="addbane">
                         <h4>purchase bane</h4>
-                        <form novalidate ng-submit="addPurchase('bane')">
-                            <label>Do it? <input type="submit" value="yes"/></label>
+                        <form ng-submit="addPurchase('bane')">
+                            <label><input type="radio" name="baneamt" ng-model="baneamt" value="5">$5 (random draw)</label><br>
+                            <label><input type="radio" name="baneamt" ng-model="baneamt" value="15" ng-disabled="current_donor.available_gold < 15.0">$15 (Select from lower table)</label><br>
+                            <label><input type="radio" name="baneamt" ng-model="baneamt" value="30" ng-disabled="current_donor.available_gold < 30.0">$30 (Select from current table)</label><br>
+                            <input type="submit" value="purchase" />
                         </form>
                     </div>
-
                 </div>
             </div>
             <div>{{error_msg}}</div>
         </div>
         
         <!-- Player Queue -->
-        <div class="box qu"><h3>Player Queue</h3>
-            <div class="playqu">WIDGET GOES HERE</div>
+        <div class="box qu" ng-controller="QueueController">
+            <h3>Player Queue ({{queue.waiting.length}})</h3>
+            {{queue_errror}}
+            <div class="playqu">
+                <table>
+                    <tr ng-repeat="q in queue.waiting">
+                        <td>{{q.name}}</td>
+                        <td>{{q.race}}</td>
+                        <td>{{q.class}}</td>
+                        <td>{{q.state}}</td>
+                    </tr>
+                </table>
+                
+            </div>
         </div>
 
         <!-- Donor Add -->
         <div class="box da" ng-controller="NewDonorController">
             <h3>Add Donor</h3>
-            <form novalidate ng-submit="addDonor(donor)">
-                <label>First Name: <input type="text" ng-model="donor.first_name"/></label><br />
-                <label>Last Name: <input type="text" ng-model="donor.last_name"/></label><br/>
-                <label>Physical Address: <input type="text" ng-model="donor.physical_address"/></label><br/>
-                <label>Email: <input type="text" ng-model="donor.email_address"/></label><br/>
-                <label>DCI Number: <input type="text" ng-model="donor.dci_number"/></label><br/>
+            <form ng-submit="addDonor(donor)">
+                <label>First Name: <input type="text" ng-model="donor.first_name" required/></label><br />
+                <label>Last Name: <input type="text" ng-model="donor.last_name" required/></label><br/>
+                <label>Physical Address: <input type="text" ng-model="donor.physical_address" required/></label><br/>
+                <label>Email: <input type="email" ng-model="donor.email_address" required/></label><br/>
+                <label>DCI Number: <input type="text" pattern="[0-9]*" title="Must be numbers only" ng-model="donor.dci_number"/></label><br/>
                 <input type="submit" value="Submit" />
             </form>
         </div>
     </div>
 
-    <!-- login modal -->
-    <div id="lm" class="logmodal" ng-controller="LoginController">
-        <div>
-            <a href="#" title="Close" class="close">X</a>
-            <h2>Please Log In</h2>
-            <fieldset>
-                <form novalidate ng-submit="doLogin(user)">
-                    <label>Username: <input type="text" ng-model="user.username"/></label><br/>
-                    <label>Password: <input type="password" ng-model="user.password"/></label><br/>
-                    <input type="submit" value="Login" />
-                </form>
-                <!-- <div>{{ user | json }}</div>
-                <div>{{ apitoken }}</div> -->
-            </fieldset>
-        </div>
-    </div>
+    
 
 </body>
 </html>
-
-<!--
-    <div class="container" ng-controller="NewCharacterController" ng-show="display">
-        <h2>New Character</h2>
-
-        <form novalidate>
-          <label>Character: <input type="text" ng-model="character.name"/></label><br/>
-          <label>Race: <input type="password" ng-model="user.password"/></label><br/>
-          <label>Class: <input type="password" ng-model="user.password"/></label><br/>
-          <label>Account paying registration: <input type="password" ng-model="user.password"/></label><br/>
-          <input type="submit" ng-click="doLogin(user)" value="Login" />
-      </form>
-      <div>{{ user | json }}</div>
-      <div>{{ apitoken }}</div>
-    </div> -->

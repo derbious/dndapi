@@ -2,7 +2,7 @@ import sqlite3
 from datetime import datetime
 from dndapi import app
 
-DATABASE_LOCATION = '/data/development.db'
+DATABASE_LOCATION = '/data/sqlite.db'
 
 def makedb():
     # Connect to the sqlite database. This can be mounted as a dir
@@ -46,6 +46,7 @@ def makedb():
             class       TEXT NOT NULL,
             state       TEXT NOT NULL,
             num_resses  INTEGER DEFAULT 0,
+            q_pos       INTEGER NOT NULL,
             player_id   INTEGER NOT NULL,
             start_time  TIMESTAMP,
             end_time    TIMESTAMP,
@@ -61,13 +62,6 @@ def makedb():
             current    INTEGER default 0
         )''')
 
-        c.execute('''
-        CREATE TABLE IF NOT EXISTS queue(
-            id            INTEGER PRIMARY KEY,
-            position      INTEGER NOT NULL,
-            character_id  INTEGER NOT NULL,
-            FOREIGN KEY(character_id) REFERENCES characters(id)
-        )''')
         # commit the changes
         dbconn.commit()
 
@@ -248,8 +242,6 @@ def get_purchase_by_id(purchase_id):
             return None
 
 
-
-
 ###################################################################################################
 ## Characters queries
 ###### 
@@ -265,9 +257,10 @@ def get_character_by_id(character_id):
                 'class': row[3],
                 'state': row[4],
                 'num_resses': row[5],
-                'player_id': row[6],
-                'start_time': row[7],
-                'end_time': row[8] }
+                'q_pos': row[6],
+                'player_id': row[7],
+                'start_time': row[8],
+                'end_time': row[9] }
         else:
             return None
 
@@ -284,16 +277,28 @@ def get_characters_for_player(player_id):
                 'class': row[3],
                 'state': row[4],
                 'num_resses': row[5],
-                'player_id': row[6],
-                'start_time': row[7],
-                'end_time': row[8] } )
+                'q_pos': row[6],
+                'player_id': row[7],
+                'start_time': row[8],
+                'end_time': row[9] } )
         return res
 
-def insert_character(name, race, clazz, state, player_id):
+def insert_character(name, race, clazz, state, player_id, benefactor_id):
     with sqlite3.connect(DATABASE_LOCATION) as dbconn:
         c = dbconn.cursor()
-        c.execute("""INSERT INTO characters(name, race, class, state, player_id) values(?,?,?,?,?)""", 
-                  [name, race, clazz, state, player_id])
+        ## First, get the highest queued(waiting) queue_position
+        c.execute("""SELECT max(q_pos) FROM characters WHERE state = 'queued'""")
+        qrow = c.fetchone()
+        if not qrow[0]:
+            next_qpos = 1
+        else:
+            next_qpos = qrow[0] + 1
+        # Insert a 5 dollar purchase for the benefactor
+        c.execute("""INSERT INTO purchases(amount, timestamp, reason, donor_id) values(?,?,?,?)""", 
+                  [500, datetime.now(), 'charentry', benefactor_id])
+        ## insert the character data
+        c.execute("""INSERT INTO characters(name, race, class, state, q_pos, player_id) values(?,?,?,?,?,?)""", 
+                  [name, race, clazz, state, next_qpos, player_id])
         c.execute("""SELECT * FROM characters WHERE rowid=?;""", (c.lastrowid,))
         row = c.fetchone()
         res = { 'id': row[0],
@@ -302,19 +307,12 @@ def insert_character(name, race, clazz, state, player_id):
                 'class': row[3],
                 'state': row[4],
                 'num_resses': row[5],
-                'player_id': row[6],
-                'start_time': row[7],
-                'end_time': row[8] }
+                'q_pos': row[6],
+                'player_id': row[7],
+                'start_time': row[8],
+                'end_time': row[9] }
         # Also, add them to the end of the queue
         app.logger.info(res)
-        c.execute("""SELECT max(position, 0) FROM queue""")
-        queuerow = c.fetchone()
-        if not queuerow:
-            newpos = 0
-        else:
-            newpos = queuerow[0] + 1 # Increment the new position
-        app.logger.info(newpos)
-        c.execute("""INSERT INTO queue (position, character_id) values(?,?)""",[newpos, res['id']])
         dbconn.commit()
         return res
 
@@ -370,17 +368,88 @@ def select_dm_teamkills():
 
 ###################################################################
 ## Queue queries
-def select_waiting_queue():
+def select_queue(state):
     with sqlite3.connect(DATABASE_LOCATION) as dbconn:
         c = dbconn.cursor()
-        c.execute("""SELECT id, position, character_id FROM queue WHERE position >= 0 ORDER BY position ASC""")
+        c.execute("""SELECT * FROM characters WHERE state = ? ORDER BY q_pos ASC;""", [state,])
         rows = c.fetchall()
         result = []
         for row in rows:
-            result.append({
-                "id": row[0],
-                "positon": row[1],
-                "character_id": row[2]
+            result.append(
+              { 'id': row[0],
+                'name': row[1],
+                'race': row[2],
+                'class': row[3],
+                'state': row[4],
+                'num_resses': row[5],
+                'q_pos': row[6],
+                'player_id': row[7],
+                'start_time': row[8],
+                'end_time': row[9]
             })
         return result
 
+def character_start(character_id, seat):
+     with sqlite3.connect(DATABASE_LOCATION) as dbconn:
+        c = dbconn.cursor()
+        c.execute("""UPDATE characters SET
+          state = 'playing',
+          q_pos = ?,
+          start_time = ?
+        WHERE id = ?""", [seat,datetime.now(), character_id])
+        dbconn.commit()
+
+def character_res(character_id):
+     with sqlite3.connect(DATABASE_LOCATION) as dbconn:
+        c = dbconn.cursor()
+        c.execute("""UPDATE characters SET
+          num_resses = num_resses+1
+        WHERE id = ?""", [character_id])
+        c.execute("""UPDATE dms SET
+          numkills = numkills+1
+        WHERE current = 1""")
+        dbconn.commit()
+
+
+def character_death(character_id):
+     with sqlite3.connect(DATABASE_LOCATION) as dbconn:
+        c = dbconn.cursor()
+        c.execute("""UPDATE characters SET
+          state = 'dead',
+          q_pos = 0,
+          end_time = ?
+        WHERE id = ?""", [datetime.now(), character_id])
+        # Also give dm the kill
+        c.execute("""UPDATE dms SET
+          numkills = numkills+1
+        WHERE current = 1""")
+        dbconn.commit()
+
+
+def queue_remove(character_id):
+    with sqlite3.connect(DATABASE_LOCATION) as dbconn:
+        c = dbconn.cursor()
+        # Get this queue position
+        c.execute("""SELECT q_pos FROM characters WHERE id=?""", [character_id,])
+        row = c.fetchone()
+        qpos = row[0]
+        # Change it's state
+        c.execute("""UPDATE characters SET state='removed' WHERE id=?""", [character_id,])
+        # Update everyone else's queue pos
+        c.execute("""UPDATE characters SET q_pos = q_pos-1 WHERE q_pos > ?""", [qpos,])
+        dbconn.commit()
+
+def queue_unremove(character_id):
+    with sqlite3.connect(DATABASE_LOCATION) as dbconn:
+        c = dbconn.cursor()
+        # Get the last queue position
+        c.execute("""SELECT max(q_pos) FROM characters WHERE state = 'queued'""")
+        row = c.fetchone()
+        app.logger.info(row)
+        if not row[0]:
+            newpos = 1
+        else:
+            newpos = row[0]+1
+        # Update the character
+        c.execute("""UPDATE characters SET state='queued', q_pos=? WHERE id=?""", [newpos,character_id,])
+        dbconn.commit()

@@ -191,14 +191,9 @@ input[type=search] {
     left: 0;
     background: rgba(0 , 0, 0, .85);
     z-index: 99999;
-    opacity: 0;
-    transition: opacity 400ms ease-in;
-    pointer-events: none;
-}
-
-.logmodal:target {
     opacity: 1;
-    pointer-events: auto;
+    /* transition: opacity 400ms ease-in; */
+    /* pointer-events: none; */
 }
 
 .logmodal > div {
