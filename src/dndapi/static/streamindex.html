@@ -85,24 +85,22 @@
 
             <div class="box qc" ng-controller="QueueController">
                 <h2>Playing</h2>
-                <table ng-repeat="n in [].constructor(6) track by $index">
-                    <tr ng-show="queue.playing[$index] === null">
+                <table>
+                    <tr ng-repeat="n in [].constructor(6) track by $index">
                         <td>P{{$index+1}}</td>
-                        <td>
-                            <form ng-submit="seatPlayer($index);">
-                            <select ng-options="character.name for character in queue.waiting track by character.id" ng-model="selected[$index]"></select>
-                            <input type="submit" value="start">
-                            </form>
+                        <td colspan="5" ng-show="queue.playing[$index] === null">
+                          <select ng-options="character.name for character in queue.waiting track by character.id" ng-model="selected[$index]"></select>
+                          <button ng-click="seatPlayer($index);">start</button>
+                        </td>
+                        <td ng-show="queue.playing[$index] !== null">{{ queue.playing[$index].name }}</td>
+                        <td ng-show="queue.playing[$index] !== null">{{ queue.playing[$index].race }}</td>
+                        <td ng-show="queue.playing[$index] !== null">{{ queue.playing[$index].class }}</td>
+                        <td ng-show="queue.playing[$index] !== null">resses: {{ queue.playing[$index].num_resses}} </td>
+                        <td ng-show="queue.playing[$index] !== null">
+                            <button ng-click="resPlayer($index);">Res (${{ Math.pow(2,Number(queue.playing[$index].num_resses))*5 }})</button>
+                            <button ng-click="killPlayer($index);">kill</button>
                         </td>
                     </tr>
-                    <tr ng-show="queue.playing[$index] !== null">
-                        <td>P{{$index+1}}</td>
-                        <td>{{ queue.playing[$index].name }}</td>
-                        <td>{{ queue.playing[$index].race }}</td>
-                        <td>{{ queue.playing[$index].class }}</td>
-                        <td>{{quque.playing[$index].num_resses}}</td>
-                        <td><button ng-click="resPlayer($index);">Res</button>
-                            <button ng-click="killPlayer($index);">kill</button></td></tr>
                 </table>
             </div>
             <div>{{queue | json }}</div>

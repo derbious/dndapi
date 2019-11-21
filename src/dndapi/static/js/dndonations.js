@@ -396,6 +396,10 @@ dndApp.controller('StreamController', ['$scope', '$http', '$interval', function(
 
 // the Queue controller
 dndApp.controller('QueueController', ['$scope', '$http', '$interval', function($scope, $http, $interval) {
+    //Pull in the math controller. this is for Math.pow()
+    $scope.Number = window.Number;
+    $scope.Math = window.Math;
+
     $scope.queue_error = "";
     $scope.queue = {};
     $scope.selected = [];
