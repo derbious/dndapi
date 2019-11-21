@@ -302,6 +302,28 @@ dndApp.controller('StreamController', ['$scope', '$http', '$interval', function(
         });
     };
 
+    $scope.setTicker = function(){
+        var token = sessionStorage.getItem('access_token');
+        console.log('changing out the ticker');
+        tk = {
+            "key": "ticker",
+            "value": $scope.stream_ticker
+        }
+        $http({
+            method: 'POST',
+            url: "api/meta",
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': "JWT "+token
+            },
+            data: tk
+        }).then(function successCallback(response) {
+            console.log('Successful call to /api/meta [POST]');
+        }, function errorCallback(response) {
+            $scope.error_msg = "Could not insert the new ticker";
+        });
+    };
+
     // Interval to pull the currentDM info
     $interval(function(){
         var token = sessionStorage.getItem('access_token');

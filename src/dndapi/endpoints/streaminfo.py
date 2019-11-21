@@ -5,10 +5,18 @@ import dndapi.database as database
 
 @app.route('/streaminfo/dm', methods=['GET',])
 def get_dm():
-    app.logger.info('in currentdm/')
     dm = database.get_current_dm()
     if dm:
         html = f'{dm["name"]}: {dm["numkills"]} kills'
+        return html, 200
+    else:
+        return '', 404
+
+@app.route('/streaminfo/ticker', methods=['GET',])
+def get_ticker():
+    tick = database.get_meta('ticker')
+    if tick:
+        html = f'{tick["value"]}'
         return html, 200
     else:
         return '', 404
