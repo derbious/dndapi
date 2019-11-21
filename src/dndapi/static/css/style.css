@@ -5,12 +5,7 @@
     gap: 1em;
     grid-template-areas: 
     "hd hd hd hd hd li"
-    "dn dn dn dn qd qd"
-    "dn dn dn dn qu qu"
-    "dn dn dn dn qu qu"
-    "dn dn dn dn qu qu"
-    "dn dn dn dn qu qu"
-    "dn dn dn dn qu qu"
+    "dn dn dn dn da da"
     "dn dn dn dn qu qu"
 }
 
@@ -41,6 +36,14 @@
 
 .qd {
     grid-area: qd;
+}
+
+.da {
+    grid-area: da;
+}
+
+.vd {
+    grid-area: vd;
 }
 
 .bb {
@@ -188,14 +191,9 @@ input[type=search] {
     left: 0;
     background: rgba(0 , 0, 0, .85);
     z-index: 99999;
-    opacity: 0;
-    transition: opacity 400ms ease-in;
-    pointer-events: none;
-}
-
-.logmodal:target {
     opacity: 1;
-    pointer-events: auto;
+    /* transition: opacity 400ms ease-in; */
+    /* pointer-events: none; */
 }
 
 .logmodal > div {

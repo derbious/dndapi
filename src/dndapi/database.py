@@ -2,7 +2,7 @@ import sqlite3
 from datetime import datetime
 from dndapi import app
 
-DATABASE_LOCATION = '/data/development.db'
+DATABASE_LOCATION = '/data/sqlite.db'
 
 def makedb():
     # Connect to the sqlite database. This can be mounted as a dir
@@ -46,6 +46,7 @@ def makedb():
             class       TEXT NOT NULL,
             state       TEXT NOT NULL,
             num_resses  INTEGER DEFAULT 0,
+            q_pos       INTEGER NOT NULL,
             player_id   INTEGER NOT NULL,
             start_time  TIMESTAMP,
             end_time    TIMESTAMP,
@@ -62,12 +63,19 @@ def makedb():
         )''')
 
         c.execute('''
-        CREATE TABLE IF NOT EXISTS queue(
-            id            INTEGER PRIMARY KEY,
-            position      INTEGER NOT NULL,
-            character_id  INTEGER NOT NULL,
-            FOREIGN KEY(character_id) REFERENCES characters(id)
+        CREATE TABLE IF NOT EXISTS meta (
+            key        TEXT PRIMARY KEY,
+            value      TEXT NOT NULL
         )''')
+
+        c.execute('''
+        INSERT OR IGNORE INTO meta(key, value) VALUES ("ticker", "")
+        ''')
+
+        c.execute('''
+        INSERT OR IGNORE INTO meta(key, value) VALUES ("nextgoal", "$750")
+        ''')
+
         # commit the changes
         dbconn.commit()
 
@@ -79,8 +87,20 @@ def get_donor_by_id(donor_id):
     with sqlite3.connect(DATABASE_LOCATION) as dbconn:
         c = dbconn.cursor()
         app.logger.info('before querty')
-        c.execute('SELECT * FROM donors WHERE id=?', (donor_id,) )
-        app.logger.info('before fetchone')
+        c.execute("""
+        SELECT
+          donors.id,
+          donors.first_name,
+          donors.last_name,
+          donors.physical_address,
+          donors.dci_number,
+          donors.email_address,
+          coalesce(don.amt, 0) as total_donations,
+          coalesce(don.amt, 0)-coalesce(pur.pamt, 0) as available_gold
+        FROM donors
+        LEFT JOIN (SELECT donor_id, sum(amount) as amt FROM donations GROUP BY donor_id) as don ON donors.id = don.donor_id
+        LEFT JOIN (SELECT donor_id, sum(amount) as pamt FROM purchases GROUP BY donor_id) as pur ON donors.id = pur.donor_id
+        WHERE donors.id = ?""", [donor_id,])
         row = c.fetchone()
         app.logger.info('after fetchone')
         result = {}
@@ -91,14 +111,9 @@ def get_donor_by_id(donor_id):
                     'last_name': row[2],
                     'physical_address': row[3],
                     'dci_number': row[4],
-                    'email_address': row[5] }
-
-            # This query gets their account balance
-            c.execute("""SELECT donsum-pursum FROM 
-                (SELECT COALESCE(SUM(amount),0) as donsum FROM donations WHERE donor_id=?) as a,
-                (SELECT COALESCE(SUM(amount),0) as pursum FROM purchases WHERE donor_id=?) as b;""", [donor_id,donor_id])
-            dsrow = c.fetchone()
-            result['balance'] = dsrow[0]/100.0
+                    'email_address': row[5],
+                    'total_donations': row[6]/100.0,
+                    'available_gold': row[7]/100.0 }
             return result
         else:
             app.logger.info('No rows found')
@@ -108,14 +123,29 @@ def get_donor_by_id(donor_id):
 def get_all_donors():   
     with sqlite3.connect(DATABASE_LOCATION) as dbconn:
         c = dbconn.cursor()
-        c.execute('SELECT * FROM donors')
+        c.execute("""
+        select
+            donors.id,
+            donors.first_name,
+            donors.last_name,
+            donors.physical_address,
+            donors.dci_number,
+            donors.email_address,
+            coalesce(don.amt, 0) as total_donations,
+            coalesce(don.amt, 0)-coalesce(pur.pamt, 0) as available_gold
+        FROM donors
+        LEFT JOIN (SELECT donor_id, sum(amount) as amt FROM donations GROUP BY donor_id) as don ON donors.id = don.donor_id
+        LEFT JOIN (SELECT donor_id, sum(amount) as pamt FROM purchases GROUP BY donor_id) as pur ON donors.id = pur.donor_id;
+        """)
         rows = c.fetchall()
         res = [ {'id': row[0],
            'first_name': row[1],
            'last_name': row[2],
            'physical_address': row[3],
            'dci_number': row[4],
-           'email_address': row[5] } for row in rows ]
+           'email_address': row[5],
+           'total_donations': row[6]/100.0,
+           'available_gold': row[7]/100.0 } for row in rows ]
         return res
 
 # Inserts the donor information into the database
@@ -199,7 +229,7 @@ def insert_donation(amount, method, donor_id):
 def insert_purchase(amount, reason, donor_id):
     with sqlite3.connect(DATABASE_LOCATION) as dbconn:
         c = dbconn.cursor()
-        c.execute("""INSERT INTO purchases(amount, timestamp, reason, donor_id) values(?,?,?,?,?)""", 
+        c.execute("""INSERT INTO purchases(amount, timestamp, reason, donor_id) values(?,?,?,?)""", 
                   [amount, datetime.now(), reason, donor_id])
         c.execute("""SELECT * FROM purchases WHERE rowid=?;""", (c.lastrowid,))
         row = c.fetchone()
@@ -226,8 +256,6 @@ def get_purchase_by_id(purchase_id):
             return None
 
 
-
-
 ###################################################################################################
 ## Characters queries
 ###### 
@@ -243,9 +271,10 @@ def get_character_by_id(character_id):
                 'class': row[3],
                 'state': row[4],
                 'num_resses': row[5],
-                'player_id': row[6],
-                'start_time': row[7],
-                'end_time': row[8] }
+                'q_pos': row[6],
+                'player_id': row[7],
+                'start_time': row[8],
+                'end_time': row[9] }
         else:
             return None
 
@@ -262,16 +291,28 @@ def get_characters_for_player(player_id):
                 'class': row[3],
                 'state': row[4],
                 'num_resses': row[5],
-                'player_id': row[6],
-                'start_time': row[7],
-                'end_time': row[8] } )
+                'q_pos': row[6],
+                'player_id': row[7],
+                'start_time': row[8],
+                'end_time': row[9] } )
         return res
 
-def insert_character(name, race, clazz, state, player_id):
+def insert_character(name, race, clazz, state, player_id, benefactor_id):
     with sqlite3.connect(DATABASE_LOCATION) as dbconn:
         c = dbconn.cursor()
-        c.execute("""INSERT INTO characters(name, race, class, state, player_id) values(?,?,?,?,?)""", 
-                  [name, race, clazz, state, player_id])
+        ## First, get the highest queued(waiting) queue_position
+        c.execute("""SELECT max(q_pos) FROM characters WHERE state = 'queued'""")
+        qrow = c.fetchone()
+        if not qrow[0]:
+            next_qpos = 1
+        else:
+            next_qpos = qrow[0] + 1
+        # Insert a 5 dollar purchase for the benefactor
+        c.execute("""INSERT INTO purchases(amount, timestamp, reason, donor_id) values(?,?,?,?)""", 
+                  [500, datetime.now(), 'charentry', benefactor_id])
+        ## insert the character data
+        c.execute("""INSERT INTO characters(name, race, class, state, q_pos, player_id) values(?,?,?,?,?,?)""", 
+                  [name, race, clazz, state, next_qpos, player_id])
         c.execute("""SELECT * FROM characters WHERE rowid=?;""", (c.lastrowid,))
         row = c.fetchone()
         res = { 'id': row[0],
@@ -280,13 +321,14 @@ def insert_character(name, race, clazz, state, player_id):
                 'class': row[3],
                 'state': row[4],
                 'num_resses': row[5],
-                'player_id': row[6],
-                'start_time': row[7],
-                'end_time': row[8] }
+                'q_pos': row[6],
+                'player_id': row[7],
+                'start_time': row[8],
+                'end_time': row[9] }
+        # Also, add them to the end of the queue
+        app.logger.info(res)
         dbconn.commit()
         return res
-
-
 
 
 #################################################################################################
@@ -314,7 +356,16 @@ def insert_current_dm(name, team):
         c.execute("""UPDATE dms SET current = 0 WHERE current = 1;""")
         ## Add the new one
         c.execute("""INSERT INTO dms(name, team, current) values(?,?,?)""", [name, team, 1])
+        c.execute("""SELECT * FROM dms WHERE rowid=?;""", (c.lastrowid,))
+        row = c.fetchone()
+        res = { 'id': row[0],
+                'name': row[1],
+                'team': row[2],
+                'numkills': row[3],
+                'current': row[4],
+              }
         dbconn.commit()
+        return res
 
 def select_dm_teamkills():
     ## This query sums up all of the dmkills based on their team.
@@ -327,3 +378,113 @@ def select_dm_teamkills():
         for row in rows:
             result[row[0]] = row[1]
         return result
+
+
+###################################################################
+## Queue queries
+def select_queue(state):
+    with sqlite3.connect(DATABASE_LOCATION) as dbconn:
+        c = dbconn.cursor()
+        c.execute("""SELECT * FROM characters WHERE state = ? ORDER BY q_pos ASC;""", [state,])
+        rows = c.fetchall()
+        result = []
+        for row in rows:
+            result.append(
+              { 'id': row[0],
+                'name': row[1],
+                'race': row[2],
+                'class': row[3],
+                'state': row[4],
+                'num_resses': row[5],
+                'q_pos': row[6],
+                'player_id': row[7],
+                'start_time': row[8],
+                'end_time': row[9]
+            })
+        return result
+
+def character_start(character_id, seat):
+     with sqlite3.connect(DATABASE_LOCATION) as dbconn:
+        c = dbconn.cursor()
+        c.execute("""UPDATE characters SET
+          state = 'playing',
+          q_pos = ?,
+          start_time = ?
+        WHERE id = ?""", [seat,datetime.now(), character_id])
+        dbconn.commit()
+
+def character_res(character_id):
+     with sqlite3.connect(DATABASE_LOCATION) as dbconn:
+        c = dbconn.cursor()
+        c.execute("""UPDATE characters SET
+          num_resses = num_resses+1
+        WHERE id = ?""", [character_id])
+        c.execute("""UPDATE dms SET
+          numkills = numkills+1
+        WHERE current = 1""")
+        dbconn.commit()
+
+
+def character_death(character_id):
+     with sqlite3.connect(DATABASE_LOCATION) as dbconn:
+        c = dbconn.cursor()
+        c.execute("""UPDATE characters SET
+          state = 'dead',
+          q_pos = 0,
+          end_time = ?
+        WHERE id = ?""", [datetime.now(), character_id])
+        # Also give dm the kill
+        c.execute("""UPDATE dms SET
+          numkills = numkills+1
+        WHERE current = 1""")
+        dbconn.commit()
+
+
+def queue_remove(character_id):
+    with sqlite3.connect(DATABASE_LOCATION) as dbconn:
+        c = dbconn.cursor()
+        # Get this queue position
+        c.execute("""SELECT q_pos FROM characters WHERE id=?""", [character_id,])
+        row = c.fetchone()
+        qpos = row[0]
+        # Change it's state
+        c.execute("""UPDATE characters SET state='removed' WHERE id=?""", [character_id,])
+        # Update everyone else's queue pos
+        c.execute("""UPDATE characters SET q_pos = q_pos-1 WHERE q_pos > ?""", [qpos,])
+        dbconn.commit()
+
+def queue_unremove(character_id):
+    with sqlite3.connect(DATABASE_LOCATION) as dbconn:
+        c = dbconn.cursor()
+        # Get the last queue position
+        c.execute("""SELECT max(q_pos) FROM characters WHERE state = 'queued'""")
+        row = c.fetchone()
+        app.logger.info(row)
+        if not row[0]:
+            newpos = 1
+        else:
+            newpos = row[0]+1
+        # Update the character
+        c.execute("""UPDATE characters SET state='queued', q_pos=? WHERE id=?""", [newpos,character_id,])
+        dbconn.commit()
+
+### Metadata queries
+def set_meta(key, value):
+    with sqlite3.connect(DATABASE_LOCATION) as dbconn:
+        c = dbconn.cursor()
+        c.execute("""INSERT INTO meta(key,value) VALUES(?,?)
+            ON CONFLICT(key) DO UPDATE SET value=?;""", [key,value,value])
+        dbconn.commit()
+
+def get_meta(key):
+    with sqlite3.connect(DATABASE_LOCATION) as dbconn:
+        c = dbconn.cursor()
+        c.execute("""SELECT * FROM meta WHERE key=?;""", [key,])
+        row = c.fetchone()
+        if row:
+            return {
+                'key': row[0],
+                'value': row[1]
+            }
+        else:
+            return None

@@ -11,7 +11,7 @@ To get the development environment up and running you need docker installed.
 ### Testing workflow
 1. Do some editing
 2. Rebuild the container with the command `docker build . -t dndapi` 
-3. Run the newly built container: `docker run -it -p 8080:8080 dndapi` This binds to port 8080 to serve up the web frontend
+3. Run the newly built container: `docker run -it -p 8080:8080 -v ${PWD}/development.db:/data/sqlite.db dndapi` This binds to port 8080 to serve up the web frontend and mounts a development database file.
 4. Point your browser to `http://localhost:8080/` to see your changes in action.
 
 The terminal output should show python logging info, and the browser developer console shows the javascript related debug info.

@@ -8,6 +8,10 @@ staticdir = '/usr/src/dndapi/dndapi/static'
 def root():
     return send_file(staticdir+"/index.html")
 
+@app.route("/streamconsole")
+def streamconsole():
+    return send_file(staticdir+"/streamindex.html")
+
 @app.route("/<path:path>")
 def index(path):
     return send_from_directory(staticdir, path)   

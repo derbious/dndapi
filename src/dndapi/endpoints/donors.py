@@ -16,7 +16,7 @@ def validate_donor_post(js):
     else:
         return False
 
-@app.route('/api/donors', methods=['POST',])
+@app.route('/api/donors', methods=['GET','POST'])
 @app.route('/api/donors/<int:donor_id>', methods=['GET'])
 @jwt_required()
 def get_donors(donor_id=None):
@@ -31,7 +31,9 @@ def get_donors(donor_id=None):
             else:
                 return '{"error": "donor not found"}', 404, {'Content-Type': 'application/json; charset=utf-8'}
         else:
-            return '{"error": "no donor_id provided"}', 404, {'Content-Type': 'application/json; charset=utf-8'}
+            # Else, return all donors
+            d = database.get_all_donors()
+            return json.dumps(d), 200, {'Content-Type': 'application/json; charset=utf-8'}
     elif request.method == 'POST':
         # pull the posted information from json and validate it
         #app.logger.info("method was post")
