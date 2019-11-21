@@ -324,7 +324,29 @@ dndApp.controller('StreamController', ['$scope', '$http', '$interval', function(
         });
     };
 
-    // Interval to pull the currentDM info
+    $scope.setNextgoal = function(){
+        var token = sessionStorage.getItem('access_token');
+        console.log("in setNextgoal", $scope.nextgoal);
+        goal = {
+            "key": "goal",
+            "value": $scope.nextgoal
+        }
+        $http({
+            method: 'POST',
+            url: "api/meta",
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': "JWT "+token
+            },
+            data: goal
+        }).then(function successCallback(response) {
+            console.log('Successful call to /api/meta [POST] (GOAL)');
+        }, function errorCallback(response) {
+            $scope.error_msg = "Could not insert the next goal";
+        });
+    };
+
+    // Interval to pull the currentDM and meta info
     $interval(function(){
         var token = sessionStorage.getItem('access_token');
         $http({
@@ -339,6 +361,34 @@ dndApp.controller('StreamController', ['$scope', '$http', '$interval', function(
             $scope.current_dm = response.data;
         }, function errorCallback(response) {
             $scope.queue_error = "Could not fetch queue";
+        });
+
+        $http({
+            method: 'GET',
+            url: "api/meta/ticker",
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': "JWT "+token
+            }
+        }).then(function successCallback(response) {
+            console.log('Successful call to /api/meta/ticker [GET]');
+            $scope.current_stream_msg = response.data.value;
+        }, function errorCallback(response) {
+            $scope.queue_error = "Could not fetch ticker";
+        });
+
+        $http({
+            method: 'GET',
+            url: "api/meta/goal",
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': "JWT "+token
+            }
+        }).then(function successCallback(response) {
+            console.log('Successful call to /api/meta/goal [GET]');
+            $scope.current_nextgoal = response.data.value;
+        }, function errorCallback(response) {
+            $scope.queue_error = "Could not fetch goal";
         });
     }, 10000);
 

@@ -45,7 +45,7 @@
                 <div>
                     <div>Current DM Name: {{current_dm.name}}</div>
                     <div>Team: {{current_dm.team}}</div>
-                    <div>Kills: {{current_dm.numkills}}</div>                        
+                    <div>Kills: {{current_dm.numkills}}</div>
                     <form ng-submit="regNewDm()">
                         <label>Name:<input type="text" ng-model="newdm.name"></input></label>
                         <label>Team:
@@ -58,27 +58,29 @@
                     </form>
                 </div>
                 <div>
-                    <select ng-model="nextgoal">
-                        <option>$750</option>
-                        <option>$1000</option>
-                        <option>$1250</option>
-                        <option>$1500</option>
-                        <option>$2000</option>
-                        <option>$2500</option>
-                        <option>$3000</option>
-                        <option>$4000</option>
-                        <option>$5000</option>
-                        <option>$7500</option>
-                        <option>$10000</option>
-                    </select>
+                    <form ng-submit="setNextgoal()">
+                        <select ng-model="nextgoal">
+                            <option>$750</option>
+                            <option>$1000</option>
+                            <option>$1250</option>
+                            <option>$1500</option>
+                            <option>$2000</option>
+                            <option>$2500</option>
+                            <option>$3000</option>
+                            <option>$4000</option>
+                            <option>$5000</option>
+                            <option>$7500</option>
+                            <option>$10000</option>
+                        </select>
+                        <input type="submit" value="Submit" />
                 </div>
             </div>
 
             <div class="box cc">
                 <h2>Rendered results here</h2>
-                <div>Stream Message: {{stream_msg}}</div>
+                <div>Current Stream Message: {{current_stream_msg}}</div>
                 <div>NewDM JSON: {{newdm | json}}</div>
-                <div>next goal: {{nextgoal}}</div>
+                <div>next goal: {{current_nextgoal}}</div>
             </div>
 
             <div class="box qc" ng-controller="QueueController">

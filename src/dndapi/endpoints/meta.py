@@ -24,11 +24,13 @@ META_SCHEMA = {
 @jwt_required()
 def get_meta(key):
     app.logger.info('in /meta/<key>')
+    app.logger.info(key)
     md = database.get_meta(key)
+    app.logger.info(md)
     if md:
         return json.dumps(md), 200, {'Content-Type': 'application/json; charset=utf-8'}
     else:
-        return 404
+        return '', 404
 
 @app.route('/api/meta', methods=['POST',])
 @jwt_required()

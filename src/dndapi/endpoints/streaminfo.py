@@ -25,12 +25,17 @@ def get_ticker():
 def get_player(seatnum):
     name = ""
     clas = ""
+    time = ""
     playing = database.select_queue('playing')
     for p in playing:
         if p['q_pos'] == seatnum:
             name = p['name']
             clas = p['class']
-    html = f'P{seatnum}: {name} {clas} ##TIMER##'
+            lifetime = (datetime.now() - datetime.fromisoformat(p['start_time'])).seconds
+            hours, remainder = divmod(lifetime, 3600)
+            minutes, seconds = divmod(remainder, 60)
+            time = '{:02}:{:02}'.format(int(hours), int(minutes))
+    html = f'P{seatnum}: {name} {clas} {time}'
     return html, 200
 
 @app.route('/streaminfo/teaminfo', methods=['GET'])
