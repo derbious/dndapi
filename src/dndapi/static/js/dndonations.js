@@ -155,7 +155,7 @@ dndApp.controller('ViewDonorController', ['$scope', '$http', function($scope, $h
             $scope.refreshDonors();
             $scope.refreshCurrentDonor();
         }, function errorCallback(response) {
-            $scope.error_msg = "Could not post donation";
+            $scope.error_msg = "Could not register character";
         });
     };
 
@@ -297,6 +297,7 @@ dndApp.controller('StreamController', ['$scope', '$http', '$interval', function(
         }).then(function successCallback(response) {
             console.log('Successful call to /api/dms [POST]');
             $scope.current_dm = response.data
+            $scope.refreshStreaminfo();
         }, function errorCallback(response) {
             $scope.error_msg = "Could not insert DM";
         });
@@ -319,6 +320,7 @@ dndApp.controller('StreamController', ['$scope', '$http', '$interval', function(
             data: tk
         }).then(function successCallback(response) {
             console.log('Successful call to /api/meta [POST]');
+            $scope.refreshStreaminfo();
         }, function errorCallback(response) {
             $scope.error_msg = "Could not insert the new ticker";
         });
@@ -341,13 +343,14 @@ dndApp.controller('StreamController', ['$scope', '$http', '$interval', function(
             data: goal
         }).then(function successCallback(response) {
             console.log('Successful call to /api/meta [POST] (GOAL)');
+            $scope.refreshStreaminfo();
         }, function errorCallback(response) {
             $scope.error_msg = "Could not insert the next goal";
         });
     };
 
     // Interval to pull the currentDM and meta info
-    $interval(function(){
+    $scope.refreshStreaminfo = function(){
         var token = sessionStorage.getItem('access_token');
         $http({
             method: 'GET',
@@ -390,7 +393,8 @@ dndApp.controller('StreamController', ['$scope', '$http', '$interval', function(
         }, function errorCallback(response) {
             $scope.queue_error = "Could not fetch goal";
         });
-    }, 10000);
+    };
+    $interval($scope.refreshStreaminfo, 10000); //10s interval
 
 }]);
 
@@ -424,6 +428,7 @@ dndApp.controller('QueueController', ['$scope', '$http', '$interval', function($
             }
         }).then(function successCallback(response) {
             console.log('Successful call to /api/characters/startplay [POST]');
+            $scope.refreshQueue();
         });
     };
 
@@ -442,6 +447,7 @@ dndApp.controller('QueueController', ['$scope', '$http', '$interval', function($
             data: {}  // nothing to post here
         }).then(function successCallback(response) {
             console.log('Successful call to /api/characters/res [POST]');
+            $scope.refreshQueue();
         });
     };
 
@@ -461,11 +467,12 @@ dndApp.controller('QueueController', ['$scope', '$http', '$interval', function($
             data: {}
         }).then(function successCallback(response) {
             console.log('Successful call to /api/characters/death [POST]');
+            $scope.refreshQueue();
         });
     };
 
     // Setup the queue poller
-    $interval(function(){
+    $scope.refreshQueue = function(){
         console.log('polling queue...')
         var token = sessionStorage.getItem('access_token');
         $http({
@@ -481,7 +488,8 @@ dndApp.controller('QueueController', ['$scope', '$http', '$interval', function($
         }, function errorCallback(response) {
             $scope.queue_error = "Could not fetch queue";
         });
-    }, 10000);
+    };
+    $interval($scope.refreshQueue, 10000);
     
 }]);
 
