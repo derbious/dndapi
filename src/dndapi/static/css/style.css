@@ -125,6 +125,13 @@ button:active {
     border: 5px solid white;
 }
 
+button:disabled,
+button[disabled]{
+  border: 1px solid #999999;
+  background-color: #cccccc;
+  color: #666666;
+}
+
 input[type=submit] {
     font-family: "Press Start 2P";
     background-color: rgba(80, 65, 108, .85);
@@ -157,7 +164,7 @@ input[type=text], input[type=password] {
     border: 1px solid #ccc;
     box-sizing: border-box;
     font-family: "PT Sans";
-    font-size: 1.25em;
+    font-size: 1.5em;
   }
 
 input[type=search] {
@@ -170,6 +177,18 @@ input[type=search] {
     font-family: "PT Sans";
     font-size: 1.5em;
 }
+
+input[type=email] {
+    width: 100%;
+    padding: 5px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    font-family: "PT Sans";
+    font-size: 1.5em;
+}
+
 
 .login {
     align-self: center;
@@ -192,8 +211,8 @@ input[type=search] {
     background: rgba(0 , 0, 0, .85);
     z-index: 99999;
     opacity: 1;
-    /* transition: opacity 400ms ease-in; */
-    /* pointer-events: none; */
+    transition: opacity 400ms ease-in;
+    
 }
 
 .logmodal > div {
