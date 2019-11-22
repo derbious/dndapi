@@ -10,6 +10,7 @@
 }
 
 .box {
+    font-family: "PT Sans";
     background-color: #8286A0;
     color: white;
     padding: .25em;
@@ -64,6 +65,7 @@
     .grid-container {
         grid-template-areas: 
         "hd"
+        "da"
         "li"
         "qd"
         "dn"
@@ -198,6 +200,27 @@ input[type=email] {
 .donadmin, .playqu {
     padding: .5em;
 }
+
+/* tables */
+table, th , td {
+    font-family: "PT Sans";
+    font-size: 1.25em;
+    padding: 5px;
+}
+  
+  table tr:nth-child(odd) {
+    background-color: #473f50;
+    padding: 5px;
+  }
+  
+  table tr:nth-child(even) {
+    background-color: #70657e;
+    padding: 5px;
+  }
+
+  td > button {
+    font-size: .75em;
+  }
 
 /* login modal */
 
