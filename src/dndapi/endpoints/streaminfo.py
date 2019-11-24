@@ -3,7 +3,13 @@ from datetime import datetime
 
 import dndapi.database as database
 
-@app.route('/streaminfo/dm', methods=['GET',])
+from flask import render_template
+
+@app.route('/streaminfo/<path:path>')
+def render_streaminfo(path=None):
+    return render_template('streaminfo.html', content_url="/api/streaminfo/"+path)
+
+@app.route('/api/streaminfo/dm', methods=['GET',])
 def get_dm():
     dm = database.get_current_dm()
     if dm:
@@ -12,7 +18,7 @@ def get_dm():
     else:
         return '', 404
 
-@app.route('/streaminfo/ticker', methods=['GET',])
+@app.route('/api/streaminfo/ticker', methods=['GET',])
 def get_ticker():
     tick = database.get_meta('ticker')
     if tick:
@@ -21,7 +27,7 @@ def get_ticker():
     else:
         return '', 404
 
-@app.route('/streaminfo/player/<int:seatnum>', methods=['GET'])
+@app.route('/api/streaminfo/player/<int:seatnum>', methods=['GET'])
 def get_player(seatnum):
     name = ""
     clas = ""
@@ -38,7 +44,7 @@ def get_player(seatnum):
     html = f'P{seatnum}: {name} {clas} {time}'
     return html, 200
 
-@app.route('/streaminfo/teaminfo', methods=['GET'])
+@app.route('/api/streaminfo/teaminfo', methods=['GET'])
 def get_teaminfo():
     tks = database.select_dm_teamkills()
     ## Fill in zero kills for losers
@@ -48,14 +54,14 @@ def get_teaminfo():
     html = f'Duskpatrol: {tks["duskpatrol"]}<br>Nightwatch: {tks["nightwatch"]}<br>Dawnguard: {tks["dawnguard"]}'
     return html, 200
 
-@app.route('/streaminfo/peril', methods=['GET'])
+@app.route('/api/streaminfo/peril', methods=['GET'])
 def get_peril():
     queued = database.select_queue('queued')
     peril_lvl = min(max(len(queued), 1), 5)
     html = f'Peril Level: {peril_lvl}'
     return html, 200
 
-@app.route('/streaminfo/graveyard', methods=['GET'])
+@app.route('/api/streaminfo/graveyard', methods=['GET'])
 def get_graveyard():
     dead_chars = database.select_queue('dead')
     html = ""
