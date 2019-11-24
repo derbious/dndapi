@@ -240,10 +240,10 @@ dndApp.controller('ViewDonorController', ['$scope', '$http', function($scope, $h
 
 // The Add Donor controller.
 dndApp.controller('NewDonorController', ['$rootScope', '$scope', '$http', function($rootScope, $scope, $http) {
-    $scope.display = false;
+    $scope.disabled = true;
 
     $rootScope.$on('login_successful', function(){
-        $scope.display = true;
+        $scope.disabled = false;
     });
 
     $scope.addDonor = function(){
