@@ -240,6 +240,7 @@ ul li{
     z-index: 9;
     cursor: pointer;
     -webkit-transition: all 0.25s linear;
+    transition: all 0.25s linear;
   }
   
   ul li:hover label{
