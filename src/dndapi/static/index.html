@@ -51,22 +51,70 @@
 
             <!-- View Donor -->
             <div id="results" ng-show="current_donor != null">
-                <h3>Donor Information</h3>
-                <div>First name: {{current_donor.first_name}}</div>
-                <div>Last name: {{current_donor.last_name}}</div>
-                <div>Email: {{current_donor.email_address}}</div>
-                <div>Physical Address: {{current_donor.physical_address}}</div>
-                <div>DCI: {{current_donor.dci_number}}</div>
-                <div>Total Donations: {{current_donor.total_donations}}</div>
-                <div>Availabe Gold: {{current_donor.available_gold}}</div>
-                <div>Characters:
-                    <ul>
+                
+                <div class="doninfobox">
+                    <h3>Donor Information</h3>
+
+                    <table class="dondeets">
+                        <tr>
+                            <td class="deetlab">First Name:</td>
+                            <td>{{current_donor.first_name}}</td>
+                        </tr>
+                        <tr>
+                            <td class="deetlab">Last Name:</td>
+                            <td>{{current_donor.last_name}}</td> 
+                        </tr>
+                        <tr>
+                            <td class="deetlab">Email:</td>
+                            <td>{{current_donor.email_address}}</td>
+                        </tr>
+                        <tr>
+                            <td class="deetlab">Physical Address:</td>
+                            <td>{{current_donor.physical_address}}</td>
+                        </tr>
+                        <tr>
+                            <td class="deetlab">DCI Number:</td>
+                            <td>{{current_donor.dci_number}}</td>
+                        </tr>
+                        <tr>
+                            <td class="deetlab">Total Donations:</td>
+                            <td>{{current_donor.total_donations}}</td>
+                        </tr>
+                        <tr>
+                            <td class="deetlab">Available Gold:</td>
+                            <td>{{current_donor.available_gold}}</td>
+                        </tr>
+                    </table>
+
+                    
+                
+<!--             
+                </div>
+                <div class="donchars"> -->
+                    
+                    <h3>Characters</h3>
+
+                    <table id="chartable">
+                        <tr ng-repeat="c in current_donor_characters">
+                            <td>Character: </td>
+                            <td>{{c.name}}</td>
+                            <td>Race: </td>
+                            <td>{{c.race}}</td>
+                            <td>Class:</td>
+                            <td>{{c.class}}</td>
+                            <td>{{c.state}}</td>
+                            <td><button class="qbtn" ng-show="c.state=='queued';" ng-click="removeFromQueue(c.id);">Remove from queue</button></td>
+                            <td><button class="qbtn" ng-show="c.state=='removed';" ng-click="unremoveFromQueue(c.id);">Add back to queue</button></td> 
+                        </tr>                        
+                    </table>
+
+                    <!-- <ul>
                         <li ng-repeat="c in current_donor_characters">
                             {{c.name}} {{c.race}} {{c.class}} {{c.state}}
-                            <button ng-show="c.state=='queued';" ng-click="removeFromQueue(c.id);">Remove from queue</button>
-                            <button ng-show="c.state=='removed';" ng-click="unremoveFromQueue(c.id);">Add back to queue</button>
+                            <button class="qbtn" ng-show="c.state=='queued';" ng-click="removeFromQueue(c.id);">Remove from queue</button>
+                            <button class="qbtn" ng-show="c.state=='removed';" ng-click="unremoveFromQueue(c.id);">Add back to queue</button>
                         </li>
-                    </ul>
+                    </ul> -->
                 </div>
                 <button ng-click="panel='addgold'">Add Gold</button>
                 <button ng-click="panel='addchar'">Add Character</button><br>

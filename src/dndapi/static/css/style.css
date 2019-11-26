@@ -23,6 +23,8 @@
     display: flex;
     justify-content: center;
     align-items: center;  
+    font-family: "Press Start 2P";
+    
 }
  
 .hd {
@@ -201,27 +203,78 @@ input[type=email] {
     padding: .5em;
 }
 
-/* tables */
-table, th , td {
+/* lookup tables */
+
+#lookup > table, th , td {
     font-family: "PT Sans";
     font-size: 1.25em;
     padding: 5px;
 }
+
+#lookup > table {
+    width: auto;
+}
   
-  table tr:nth-child(odd) {
+  #lookup > table tr:nth-child(odd) {
     background-color: #473f50;
     padding: 5px;
   }
   
-  table tr:nth-child(even) {
-    background-color: #70657e;
+  #lookup > table tr:nth-child(even) {
+    background-color: #8286A0;
     padding: 5px;
   }
 
-  td > button {
-    font-size: .75em;
+  #lookup > button {
+    font-size: .5em;
   }
 
+  
+
+/* donor information styling */
+.doninfobox {
+    font-family: "PT Sans";
+    font-size: 1.25em;
+    border: 2px solid white;
+    border-radius: 8px;
+    padding: .25em
+}
+
+.doninfobox > div {
+    padding: .25em;
+
+}
+
+.doninfobox > table {
+    width: auto;
+    text-align: left;
+}
+
+.deetlab {
+    font-weight: bold;
+    /* width: 35%; */
+}
+
+/* donor characters */
+
+.results > li {
+    font-family: "PT Sans";
+    font-size: 1.25em;
+}
+
+table tr:nth-child(odd) {
+    background-color: #473f50;
+    padding: 5px;
+  }
+  
+table tr:nth-child(even) {
+    background-color: #8286A0;
+    padding: 5px;
+  }
+
+table > button {
+    font-size: .5em;
+}
 /* login modal */
 
 .logmodal {
