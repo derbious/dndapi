@@ -154,37 +154,15 @@ input[type=submit]:active {
 
 
 input[type=text], input[type=password], input[type=search], input[type=email]{
-    width: 100%;
-    padding: 12px 20px;
-    margin: 8px 0px 0px 0px;
+    width: 90%;
+    padding: 5px 10px;
+    margin: 5px 0px;
     display: inline-block;
     border: 1px solid #ccc;
     box-sizing: border-box;
     font-family: "PT Sans";
     font-size: 1.5em;
   }
-
-/* input[type=search] {
-    width: 100%;
-    padding: 5px 20px;
-    margin: 8px 0;
-    display: inline-block;
-    border: 1px solid #ccc;
-    box-sizing: border-box;
-    font-family: "PT Sans";
-    font-size: 1.5em;
-} */
-
-/* input[type=email] {
-    width: 100%;
-    padding: 5px 20px;
-    margin: 8px 0;
-    display: inline-block;
-    border: 1px solid #ccc;
-    box-sizing: border-box;
-    font-family: "PT Sans";
-    font-size: 1.5em; 
- */
 
  .select-css {
     display: block;
@@ -219,16 +197,15 @@ input[type=text], input[type=password], input[type=search], input[type=email]{
 }
 .select-css:focus {
     border-color: #aaa;
-    box-shadow: 0 0 1px 3px rgba(105, 62, 226, 0.699);
+    box-shadow: 0 0 1px 3px rgba(88, 58, 172, 0.699);
     box-shadow: 0 0 0 3px -moz-mac-focusring;
     color: #222; 
     outline: none;
 }
 .select-css option {
     font-weight:normal;
+    font-size: 1.15em;
 }
-
-
 
 
 .login {
@@ -241,7 +218,7 @@ input[type=text], input[type=password], input[type=search], input[type=email]{
 }
 
 
-/* lookup tables */
+/* lookup table */
 
 #lookup > table, th , td {
     font-family: "PT Sans";

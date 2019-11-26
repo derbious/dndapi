@@ -125,66 +125,61 @@
                     <div ng-switch-when="addgold">
                         <form ng-submit="addDonation()">
                             <label for="amount">Amount:</label><br>
-                            <input type="text" name="amount" ng-model="nd.amount">
+                            <input type="text" name="amount" ng-model="nd.amount"><br>
                             <label for="method">Method:</label><br>
                             <select class="select-css" name="method" ng-model="nd.method">
                                 <option value="cash" default>Cash</option>
                                 <option value="online">Online</option>
-                            </select>
+                            </select><br>
                             <input type="submit" value="Submit">
                         </form>
                     </div>
 
 
-                    <!-- <div ng-switch-when="addgold">
-                        <form ng-submit="addDonation()">
-                            <label>Amount: <input type="text" ng-model="nd.amount"/></label><br/>
-                            <label>Method: 
-                                <select ng-model="nd.method">
-                                    <option value="cash" default>Cash</option>
-                                    <option value="online">Online</option>
-                                </select></label><br/>
-                            <input type="submit" value="Submit" />
-                        </form>
-                    </div> -->
-
                     <!-- add char -->
+
                     <div ng-switch-when="addchar">
                         <h3>Add New Character</h3>
                         <form novalidate ng-submit="createCharacter()">
-                          <label>Character Name: </label> <input type="text" ng-model="character.name"/><<br>
-                          <label>Race:<select ng-model="character.race">
-                              <option selected>Dragonborn</option>
-                              <option>Drow</option>
-                              <option>Dwarf</option>
-                              <option>Elf</option>
-                              <option>Gnome</option>
-                              <option>Half-Elf</option>
-                              <option>Half-Orc</option>
-                              <option>Halfling</option>
-                              <option>Human</option>
-                              <option>Tiefling</option>
-                          </select></label>
-                          <label>Character Class<select ng-model="character.char_class">
-                              <option selected>Barbarian</option>
-                              <option>Bard</option>
-                              <option>Cleric</option>
-                              <option>Druid</option>
-                              <option>Fighter</option>
-                              <option>Monk</option>
-                              <option>Paladin</option>
-                              <option>Ranger</option>
-                              <option>Rogue</option>
-                              <option>Sorcerer</option>
-                              <option>Warlock</option>
-                              <option>Wizard</option>
-                          </select>
-                          <label>Benefactor:<select ng-model="character.benefactor">
-                              <option ng-repeat="donor in donors" value="{{donor.id}}" ng-if="donor.available_gold >= 5">{{donor.first_name}} {{donor.last_name}}</option>
-                          </select></label>
-                          <input type="submit" value="Create"/>
-                        </form>
+                            <label for="charname">Character Name:</label>
+                            <input type="text" name="charname" ng-model="character.name"><br>
+                            <label for="charrace">Race:</label>
+                            <select class="select-css" name="charrace" ng-model="character.race">
+                                <option selected>Dragonborn</option>
+                                <option>Drow</option>
+                                <option>Dwarf</option>
+                                <option>Elf</option>
+                                <option>Gnome</option>
+                                <option>Half-Elf</option>
+                                <option>Half-Orc</option>
+                                <option>Halfling</option>
+                                <option>Human</option>
+                                <option>Tiefling</option>
+                            </select>
+                            <label for="charclass">Character Class:</label>    
+                            <select class="select-css" name="charclass" ng-model="character.char_class">
+                                <option selected>Barbarian</option>
+                                <option>Bard</option>
+                                <option>Cleric</option>
+                                <option>Druid</option>
+                                <option>Fighter</option>
+                                <option>Monk</option>
+                                <option>Paladin</option>
+                                <option>Ranger</option>
+                                <option>Rogue</option>
+                                <option>Sorcerer</option>
+                                <option>Warlock</option>
+                                <option>Wizard</option>
+                            </select>
+                            <label for="buyer">Benefactor:</label>
+                            <select class="select-css" name="buyer" ng-model="character.benefactor">
+                                <option ng-repeat="donor in donors" value="{{donor.id}}" ng-if="donor.available_gold >= 5">{{donor.first_name}} {{donor.last_name}}</option>
+                            </select><br>
+                            <input type="submit" value="Create"/>
+                            </form>
                     </div>
+
+
                     <!-- add boon -->
                     <div ng-switch-when="addboon">
                         <h4>purchase boon</h4>
@@ -202,12 +197,12 @@
                             <label><input type="radio" name="baneamt" ng-model="baneamt" value="5">$5 (random draw)</label><br>
                             <label><input type="radio" name="baneamt" ng-model="baneamt" value="15" ng-disabled="current_donor.available_gold < 15.0">$15 (Select from lower table)</label><br>
                             <label><input type="radio" name="baneamt" ng-model="baneamt" value="30" ng-disabled="current_donor.available_gold < 30.0">$30 (Select from current table)</label><br>
-                            <input type="submit" value="purchase" />
+                            <input type="submit" value="purchase">
                         </form>
                     </div>
                 </div>
             </div>
-            <div>{{error_msg}}</div>
+            <div class="error">{{error_msg}}</div>
         </div>
         
         <!-- Player Queue -->
