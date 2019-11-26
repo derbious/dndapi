@@ -25,9 +25,11 @@
                     <h2>Please Log In</h2>
                     <fieldset>
                         <form novalidate ng-submit="doLogin(user)">
-                            <label>Username: <input type="text" ng-model="user.username"/></label><br/>
-                            <label>Password: <input type="password" ng-model="user.password"/></label><br/>
-                            <input type="submit" value="Login" />
+                            <label for="user-name">Username:</label><br>
+                            <input style="text-align: center" type="text" name="user-name" ng-model="user.username"/><br>
+                            <label for="pass-word">Password:</label><br>
+                            <input style="text-align: center" type="password" name="pass-word" ng-model="user.password"/><br>
+                            <input type="submit" value="Login">
                         </form>
                     </fieldset>
                 </div>
@@ -44,7 +46,7 @@
                         <td>{{ d.first_name }}</td>
                         <td>{{ d.last_name }}</td>
                         <td>{{ d.email_address }}</td>
-                        <td><button>Select</button></td>
+                        <td style="background-color: #8286A0;"><button>Select</button></td>
                     </tr>
                 </table>
             </div>
@@ -88,9 +90,7 @@
 
                     
                 
-<!--             
-                </div>
-                <div class="donchars"> -->
+
                     <div id="donchars">
                         <h3>Characters</h3>
 
@@ -113,16 +113,20 @@
                     
 
                 </div>
-                <button ng-click="panel='addgold'">Add Gold</button>
-                <button ng-click="panel='addchar'">Add Character</button><br>
-                <button ng-click="panel='addboon'" ng-disabled="current_donor.available_gold < 5.0">Purchase Boon</button>
-                <button ng-click="panel='addbane'" ng-disabled="current_donor.available_gold < 5.0">Purchase Bane</button>
+                <div class="donops">
+                    <h3>Donor Operations</h3><br>
+                    <button ng-click="panel='addgold'">Add Gold</button>
+                    <button ng-click="panel='addchar'">Add Character</button>
+                    <button ng-click="panel='addboon'" ng-disabled="current_donor.available_gold < 5.0">Purchase Boon</button>
+                    <button ng-click="panel='addbane'" ng-disabled="current_donor.available_gold < 5.0">Purchase Bane</button>
+                </div>
 
                 <!-- This div's content is swapped out -->
-                <div ng-switch on="panel">
+                <div class="op" ng-switch on="panel">
                     <!-- add Gold panel-->
-
+                        
                     <div ng-switch-when="addgold">
+                        <h3>Add Gold</h3><br>
                         <form ng-submit="addDonation()">
                             <label for="amount">Amount:</label><br>
                             <input type="text" name="amount" ng-model="nd.amount"><br>
@@ -141,7 +145,7 @@
                     <div ng-switch-when="addchar">
                         <h3>Add New Character</h3>
                         <form novalidate ng-submit="createCharacter()">
-                            <label for="charname">Character Name:</label>
+                            <label for="charname">Character Name:</label><br>
                             <input type="text" name="charname" ng-model="character.name"><br>
                             <label for="charrace">Race:</label>
                             <select class="select-css" name="charrace" ng-model="character.race">
@@ -226,12 +230,17 @@
         <div class="box da" ng-controller="NewDonorController">
             <h3>Add Donor</h3>
             <form ng-submit="addDonor(donor)">
-                <label>First Name: <input type="text" ng-model="donor.first_name" required/></label><br />
-                <label>Last Name: <input type="text" ng-model="donor.last_name" required/></label><br/>
-                <label>Physical Address: <input type="text" ng-model="donor.physical_address" required/></label><br/>
-                <label>Email: <input type="email" ng-model="donor.email_address" required/></label><br/>
-                <label>DCI Number: <input type="text" pattern="[0-9]*" title="Must be numbers only" ng-model="donor.dci_number"/></label><br/>
-                <input type="submit" value="Submit" />
+                <label for="firstname">First Name:</label><br>
+                <input type="text" name="firstname" ng-model="donor.first_name" required><br>
+                <label for="lastname">Last Name:</label><br>
+                <input type="text" name="lastname" ng-model="donor.last_name" required><br>
+                <label for="physaddress">Physical Address:</label><br>
+                <input type="text" name="physaddress" ng-model="donor.physical_address" required><br>
+                <label for="donnor-email">Email:</label><br>
+                <input type="email" name="donnor-email" ng-model="donor.email_address" required><br>
+                <label for="donor-dci">DCI Number:</label><br>
+                <input type="text" name="donor-dci" pattern="[0-9]*" title="Must be numbers only" ng-model="donor.dci_number"><br>
+                <input type="submit" value="Submit">
             </form>
         </div>
     </div>

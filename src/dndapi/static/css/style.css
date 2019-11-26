@@ -4,10 +4,11 @@
     display: grid;
     gap: 1em;
     grid-template-areas: 
-    "hd hd hd hd hd li"
-    "dn dn dn dn da da"
-    "dn dn dn dn qu qu"
-    "dn dn dn dn qu qu"
+    "hd hd hd li"
+    "da da da qu"
+    "da da da qu"
+    "dn dn dn dn"
+    "dn dn dn dn"
 }
 
 .box {
@@ -36,6 +37,10 @@
 
 .dn {
     grid-area: dn;
+}
+
+.op {
+    grid-area: op;
 }
 
 .qd {
@@ -125,6 +130,9 @@ button[disabled]{
 
 label {
     font-size: 1.5em;
+    font-weight: bold;
+    margin-left: 5px;
+    
 }
 
 
@@ -154,14 +162,15 @@ input[type=submit]:active {
 
 
 input[type=text], input[type=password], input[type=search], input[type=email]{
-    width: 90%;
-    padding: 5px 10px;
-    margin: 5px 0px;
+    width: 98%;
+    padding: 5px;
+    margin: 5px;
     display: inline-block;
     border: 1px solid #ccc;
     box-sizing: border-box;
     font-family: "PT Sans";
     font-size: 1.5em;
+    border-radius: .5em;
   }
 
  .select-css {
@@ -175,7 +184,7 @@ input[type=text], input[type=password], input[type=search], input[type=email]{
     width: 80%;
     max-width: 80%; 
     box-sizing: border-box;
-    margin: 0;
+    margin-left: 5px;
     border: 1px solid #aaa;
     box-shadow: 0 1px 0 1px rgba(0, 0, 0, 0.04);
     border-radius: .5em;
@@ -232,7 +241,8 @@ input[type=text], input[type=password], input[type=search], input[type=email]{
 }
 
 #lookup > table {
-    width: auto;
+    width: 100%;
+    border-collapse: collapse;
 }
   
   #lookup > table tr:nth-child(odd) {
@@ -275,11 +285,45 @@ input[type=text], input[type=password], input[type=search], input[type=email]{
     /* width: 35%; */
 }
 
+.donops {
+    display: flex;
+    justify-content: space-around;
+    padding: 1em;
+    align-content: center;
+}
+
 /* donor characters */
 
 #chartable {
     width: auto;
+    border-collapse: collapse;
 }
+
+#chartable > table tr:nth-child(odd) {
+    background-color: #473f50;
+    padding: 5px;
+  }
+  
+#chartable > table tr:nth-child(even) {
+    background-color: #8286A0;
+    padding: 5px;
+  }
+
+/* player queue */
+
+.playqu > table {
+    border-collapse: collapse;
+}
+
+.playqu > table tr:nth-child(odd) {
+    background-color: #473f50;
+    padding: 5px;
+  }
+  
+.playqu > table tr:nth-child(even) {
+    background-color: #8286A0;
+    padding: 5px;
+  }
 
 /* login modal */
 
