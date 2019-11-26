@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DnDonations Stream information</title>
+    <link href="https://fonts.googleapis.com/css?family=PT+Sans|Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: black;
+            color: white;
+        }
+    </style>
+    <script type="text/javascript">
+        var url = "{{ content_url }}";
+        function updateContent () {
+            document.getElementById('content').innerHTML = this.responseText;
+        }
+        setInterval(function(){
+            var oReq = new XMLHttpRequest();
+            oReq.addEventListener("load", updateContent);
+            oReq.open("GET", url);
+            oReq.send();
+        }, 5000);
+     </script>
+</head>
+<body>
+    <div id="content"></div>
+</body>
+</html>

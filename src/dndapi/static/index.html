@@ -285,7 +285,7 @@
                 <input type="email" name="donnor-email" ng-model="donor.email_address" required><br>
                 <label for="donor-dci">DCI Number:</label><br>
                 <input type="text" name="donor-dci" pattern="[0-9]*" title="Must be numbers only" ng-model="donor.dci_number"><br>
-                <input type="submit" value="Submit">
+                <input type="submit" value="Submit" ng-disabled="disabled"/>
             </form>
         </div>
     </div>

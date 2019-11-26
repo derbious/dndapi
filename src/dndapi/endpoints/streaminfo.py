@@ -3,9 +3,14 @@ from datetime import datetime
 
 import dndapi.database as database
 
-@app.route('/streaminfo/dm', methods=['GET',])
+from flask import render_template
+
+@app.route('/streaminfo/<path:path>')
+def render_streaminfo(path=None):
+    return render_template('streaminfo.html', content_url="/api/streaminfo/"+path)
+
+@app.route('/api/streaminfo/dm', methods=['GET',])
 def get_dm():
-    app.logger.info('in currentdm/')
     dm = database.get_current_dm()
     if dm:
         html = f'{dm["name"]}: {dm["numkills"]} kills'
@@ -13,19 +18,33 @@ def get_dm():
     else:
         return '', 404
 
-@app.route('/streaminfo/player/<int:seatnum>', methods=['GET'])
+@app.route('/api/streaminfo/ticker', methods=['GET',])
+def get_ticker():
+    tick = database.get_meta('ticker')
+    if tick:
+        html = f'{tick["value"]}'
+        return html, 200
+    else:
+        return '', 404
+
+@app.route('/api/streaminfo/player/<int:seatnum>', methods=['GET'])
 def get_player(seatnum):
     name = ""
     clas = ""
+    time = ""
     playing = database.select_queue('playing')
     for p in playing:
         if p['q_pos'] == seatnum:
             name = p['name']
             clas = p['class']
-    html = f'P{seatnum}: {name} {clas} ##TIMER##'
+            lifetime = (datetime.now() - datetime.fromisoformat(p['start_time'])).seconds
+            hours, remainder = divmod(lifetime, 3600)
+            minutes, seconds = divmod(remainder, 60)
+            time = '{:02}:{:02}'.format(int(hours), int(minutes))
+    html = f'P{seatnum}: {name} {clas} {time}'
     return html, 200
 
-@app.route('/streaminfo/teaminfo', methods=['GET'])
+@app.route('/api/streaminfo/teaminfo', methods=['GET'])
 def get_teaminfo():
     tks = database.select_dm_teamkills()
     ## Fill in zero kills for losers
@@ -35,14 +54,14 @@ def get_teaminfo():
     html = f'Duskpatrol: {tks["duskpatrol"]}<br>Nightwatch: {tks["nightwatch"]}<br>Dawnguard: {tks["dawnguard"]}'
     return html, 200
 
-@app.route('/streaminfo/peril', methods=['GET'])
+@app.route('/api/streaminfo/peril', methods=['GET'])
 def get_peril():
     queued = database.select_queue('queued')
     peril_lvl = min(max(len(queued), 1), 5)
     html = f'Peril Level: {peril_lvl}'
     return html, 200
 
-@app.route('/streaminfo/graveyard', methods=['GET'])
+@app.route('/api/streaminfo/graveyard', methods=['GET'])
 def get_graveyard():
     dead_chars = database.select_queue('dead')
     html = ""

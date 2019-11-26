@@ -62,6 +62,20 @@ def makedb():
             current    INTEGER default 0
         )''')
 
+        c.execute('''
+        CREATE TABLE IF NOT EXISTS meta (
+            key        TEXT PRIMARY KEY,
+            value      TEXT NOT NULL
+        )''')
+
+        c.execute('''
+        INSERT OR IGNORE INTO meta(key, value) VALUES ("ticker", "")
+        ''')
+
+        c.execute('''
+        INSERT OR IGNORE INTO meta(key, value) VALUES ("nextgoal", "$750")
+        ''')
+
         # commit the changes
         dbconn.commit()
 
@@ -453,3 +467,24 @@ def queue_unremove(character_id):
         # Update the character
         c.execute("""UPDATE characters SET state='queued', q_pos=? WHERE id=?""", [newpos,character_id,])
         dbconn.commit()
+
+### Metadata queries
+def set_meta(key, value):
+    with sqlite3.connect(DATABASE_LOCATION) as dbconn:
+        c = dbconn.cursor()
+        c.execute("""INSERT INTO meta(key,value) VALUES(?,?)
+            ON CONFLICT(key) DO UPDATE SET value=?;""", [key,value,value])
+        dbconn.commit()
+
+def get_meta(key):
+    with sqlite3.connect(DATABASE_LOCATION) as dbconn:
+        c = dbconn.cursor()
+        c.execute("""SELECT * FROM meta WHERE key=?;""", [key,])
+        row = c.fetchone()
+        if row:
+            return {
+                'key': row[0],
+                'value': row[1]
+            }
+        else:
+            return None

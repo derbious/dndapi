@@ -10,8 +10,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY src/ .
 RUN pip install --no-cache-dir -e .
 
-#RUN python -c "import os;print(os.urandom(24).hex());" > /secretkey.txt
-RUN echo "some_secret" > /secretkey.txt
+RUN python -c "import os;print(os.urandom(24).hex());" > /secretkey.txt
 RUN mkdir /data
 
 ENV FLASK_APP dndapi

@@ -37,14 +37,15 @@
             <div class="box dn">
                 {{error_msg}}
                 <div>
-                    <form >
-                        <input type="text" ng-model="stream_msg"></input>
+                    <form ng-submit="setTicker();">
+                        <input type="text" ng-model="stream_ticker"></input>
+                        <input type="submit" value="Change Ticker" />
                     </form>
                 </div>
                 <div>
                     <div>Current DM Name: {{current_dm.name}}</div>
                     <div>Team: {{current_dm.team}}</div>
-                    <div>Kills: {{current_dm.numkills}}</div>                        
+                    <div>Kills: {{current_dm.numkills}}</div>
                     <form ng-submit="regNewDm()">
                         <label>Name:<input type="text" ng-model="newdm.name"></input></label>
                         <label>Team:
@@ -57,49 +58,49 @@
                     </form>
                 </div>
                 <div>
-                    <select ng-model="nextgoal">
-                        <option>$750</option>
-                        <option>$1000</option>
-                        <option>$1250</option>
-                        <option>$1500</option>
-                        <option>$2000</option>
-                        <option>$2500</option>
-                        <option>$3000</option>
-                        <option>$4000</option>
-                        <option>$5000</option>
-                        <option>$7500</option>
-                        <option>$10000</option>
-                    </select>
+                    <form ng-submit="setNextgoal()">
+                        <select ng-model="nextgoal">
+                            <option>$750</option>
+                            <option>$1000</option>
+                            <option>$1250</option>
+                            <option>$1500</option>
+                            <option>$2000</option>
+                            <option>$2500</option>
+                            <option>$3000</option>
+                            <option>$4000</option>
+                            <option>$5000</option>
+                            <option>$7500</option>
+                            <option>$10000</option>
+                        </select>
+                        <input type="submit" value="Submit" />
                 </div>
             </div>
 
             <div class="box cc">
                 <h2>Rendered results here</h2>
-                <div>Stream Message: {{stream_msg}}</div>
+                <div>Current Stream Message: {{current_stream_msg}}</div>
                 <div>NewDM JSON: {{newdm | json}}</div>
-                <div>next goal: {{nextgoal}}</div>
+                <div>next goal: {{current_nextgoal}}</div>
             </div>
 
             <div class="box qc" ng-controller="QueueController">
                 <h2>Playing</h2>
-                <table ng-repeat="n in [].constructor(6) track by $index">
-                    <tr ng-show="queue.playing[$index] === null">
+                <table>
+                    <tr ng-repeat="n in [].constructor(6) track by $index">
                         <td>P{{$index+1}}</td>
-                        <td>
-                            <form ng-submit="seatPlayer($index);">
-                            <select ng-options="character.name for character in queue.waiting track by character.id" ng-model="selected[$index]"></select>
-                            <input type="submit" value="start">
-                            </form>
+                        <td colspan="5" ng-show="queue.playing[$index] === null">
+                          <select ng-options="character.name for character in queue.waiting track by character.id" ng-model="selected[$index]"></select>
+                          <button ng-click="seatPlayer($index);">start</button>
+                        </td>
+                        <td ng-show="queue.playing[$index] !== null">{{ queue.playing[$index].name }}</td>
+                        <td ng-show="queue.playing[$index] !== null">{{ queue.playing[$index].race }}</td>
+                        <td ng-show="queue.playing[$index] !== null">{{ queue.playing[$index].class }}</td>
+                        <td ng-show="queue.playing[$index] !== null">resses: {{ queue.playing[$index].num_resses}} </td>
+                        <td ng-show="queue.playing[$index] !== null">
+                            <button ng-click="resPlayer($index);">Res (${{ Math.pow(2,Number(queue.playing[$index].num_resses))*5 }})</button>
+                            <button ng-click="killPlayer($index);">kill</button>
                         </td>
                     </tr>
-                    <tr ng-show="queue.playing[$index] !== null">
-                        <td>P{{$index+1}}</td>
-                        <td>{{ queue.playing[$index].name }}</td>
-                        <td>{{ queue.playing[$index].race }}</td>
-                        <td>{{ queue.playing[$index].class }}</td>
-                        <td>{{quque.playing[$index].num_resses}}</td>
-                        <td><button ng-click="resPlayer($index);">Res</button>
-                            <button ng-click="killPlayer($index);">kill</button></td></tr>
                 </table>
             </div>
             <div>{{queue | json }}</div>

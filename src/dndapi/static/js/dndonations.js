@@ -155,7 +155,7 @@ dndApp.controller('ViewDonorController', ['$scope', '$http', function($scope, $h
             $scope.refreshDonors();
             $scope.refreshCurrentDonor();
         }, function errorCallback(response) {
-            $scope.error_msg = "Could not post donation";
+            $scope.error_msg = "Could not register character";
         });
     };
 
@@ -240,10 +240,10 @@ dndApp.controller('ViewDonorController', ['$scope', '$http', function($scope, $h
 
 // The Add Donor controller.
 dndApp.controller('NewDonorController', ['$rootScope', '$scope', '$http', function($rootScope, $scope, $http) {
-    $scope.display = false;
+    $scope.disabled = true;
 
     $rootScope.$on('login_successful', function(){
-        $scope.display = true;
+        $scope.disabled = false;
     });
 
     $scope.addDonor = function(){
@@ -297,13 +297,60 @@ dndApp.controller('StreamController', ['$scope', '$http', '$interval', function(
         }).then(function successCallback(response) {
             console.log('Successful call to /api/dms [POST]');
             $scope.current_dm = response.data
+            $scope.refreshStreaminfo();
         }, function errorCallback(response) {
             $scope.error_msg = "Could not insert DM";
         });
     };
 
-    // Interval to pull the currentDM info
-    $interval(function(){
+    $scope.setTicker = function(){
+        var token = sessionStorage.getItem('access_token');
+        console.log('changing out the ticker');
+        tk = {
+            "key": "ticker",
+            "value": $scope.stream_ticker
+        }
+        $http({
+            method: 'POST',
+            url: "api/meta",
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': "JWT "+token
+            },
+            data: tk
+        }).then(function successCallback(response) {
+            console.log('Successful call to /api/meta [POST]');
+            $scope.refreshStreaminfo();
+        }, function errorCallback(response) {
+            $scope.error_msg = "Could not insert the new ticker";
+        });
+    };
+
+    $scope.setNextgoal = function(){
+        var token = sessionStorage.getItem('access_token');
+        console.log("in setNextgoal", $scope.nextgoal);
+        goal = {
+            "key": "goal",
+            "value": $scope.nextgoal
+        }
+        $http({
+            method: 'POST',
+            url: "api/meta",
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': "JWT "+token
+            },
+            data: goal
+        }).then(function successCallback(response) {
+            console.log('Successful call to /api/meta [POST] (GOAL)');
+            $scope.refreshStreaminfo();
+        }, function errorCallback(response) {
+            $scope.error_msg = "Could not insert the next goal";
+        });
+    };
+
+    // Interval to pull the currentDM and meta info
+    $scope.refreshStreaminfo = function(){
         var token = sessionStorage.getItem('access_token');
         $http({
             method: 'GET',
@@ -318,12 +365,45 @@ dndApp.controller('StreamController', ['$scope', '$http', '$interval', function(
         }, function errorCallback(response) {
             $scope.queue_error = "Could not fetch queue";
         });
-    }, 10000);
+
+        $http({
+            method: 'GET',
+            url: "api/meta/ticker",
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': "JWT "+token
+            }
+        }).then(function successCallback(response) {
+            console.log('Successful call to /api/meta/ticker [GET]');
+            $scope.current_stream_msg = response.data.value;
+        }, function errorCallback(response) {
+            $scope.queue_error = "Could not fetch ticker";
+        });
+
+        $http({
+            method: 'GET',
+            url: "api/meta/goal",
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': "JWT "+token
+            }
+        }).then(function successCallback(response) {
+            console.log('Successful call to /api/meta/goal [GET]');
+            $scope.current_nextgoal = response.data.value;
+        }, function errorCallback(response) {
+            $scope.queue_error = "Could not fetch goal";
+        });
+    };
+    $interval($scope.refreshStreaminfo, 10000); //10s interval
 
 }]);
 
 // the Queue controller
 dndApp.controller('QueueController', ['$scope', '$http', '$interval', function($scope, $http, $interval) {
+    //Pull in the math controller. this is for Math.pow()
+    $scope.Number = window.Number;
+    $scope.Math = window.Math;
+
     $scope.queue_error = "";
     $scope.queue = {};
     $scope.selected = [];
@@ -348,6 +428,7 @@ dndApp.controller('QueueController', ['$scope', '$http', '$interval', function($
             }
         }).then(function successCallback(response) {
             console.log('Successful call to /api/characters/startplay [POST]');
+            $scope.refreshQueue();
         });
     };
 
@@ -366,6 +447,7 @@ dndApp.controller('QueueController', ['$scope', '$http', '$interval', function($
             data: {}  // nothing to post here
         }).then(function successCallback(response) {
             console.log('Successful call to /api/characters/res [POST]');
+            $scope.refreshQueue();
         });
     };
 
@@ -385,11 +467,12 @@ dndApp.controller('QueueController', ['$scope', '$http', '$interval', function($
             data: {}
         }).then(function successCallback(response) {
             console.log('Successful call to /api/characters/death [POST]');
+            $scope.refreshQueue();
         });
     };
 
     // Setup the queue poller
-    $interval(function(){
+    $scope.refreshQueue = function(){
         console.log('polling queue...')
         var token = sessionStorage.getItem('access_token');
         $http({
@@ -405,7 +488,8 @@ dndApp.controller('QueueController', ['$scope', '$http', '$interval', function($
         }, function errorCallback(response) {
             $scope.queue_error = "Could not fetch queue";
         });
-    }, 10000);
+    };
+    $interval($scope.refreshQueue, 10000);
     
 }]);
 
