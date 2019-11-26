@@ -91,30 +91,27 @@
 <!--             
                 </div>
                 <div class="donchars"> -->
+                    <div id="donchars">
+                        <h3>Characters</h3>
+
+                        <table id="chartable">
+                            <tr ng-repeat="c in current_donor_characters">
+                                <td>Character: </td>
+                                <td>{{c.name}}</td>
+                                <td>Race: </td>
+                                <td>{{c.race}}</td>
+                                <td>Class:</td>
+                                <td>{{c.class}}</td>
+                                <td>{{c.state}}</td>
+                                <td>
+                                    <button class="qbtn" ng-show="c.state=='queued';" ng-click="removeFromQueue(c.id);">Remove from queue</button>
+                                    <button class="qbtn" ng-show="c.state=='removed';" ng-click="unremoveFromQueue(c.id);">Add back to queue</button>
+                                </td> 
+                            </tr>                        
+                        </table>
+                    </div>
                     
-                    <h3>Characters</h3>
 
-                    <table id="chartable">
-                        <tr ng-repeat="c in current_donor_characters">
-                            <td>Character: </td>
-                            <td>{{c.name}}</td>
-                            <td>Race: </td>
-                            <td>{{c.race}}</td>
-                            <td>Class:</td>
-                            <td>{{c.class}}</td>
-                            <td>{{c.state}}</td>
-                            <td><button class="qbtn" ng-show="c.state=='queued';" ng-click="removeFromQueue(c.id);">Remove from queue</button></td>
-                            <td><button class="qbtn" ng-show="c.state=='removed';" ng-click="unremoveFromQueue(c.id);">Add back to queue</button></td> 
-                        </tr>                        
-                    </table>
-
-                    <!-- <ul>
-                        <li ng-repeat="c in current_donor_characters">
-                            {{c.name}} {{c.race}} {{c.class}} {{c.state}}
-                            <button class="qbtn" ng-show="c.state=='queued';" ng-click="removeFromQueue(c.id);">Remove from queue</button>
-                            <button class="qbtn" ng-show="c.state=='removed';" ng-click="unremoveFromQueue(c.id);">Add back to queue</button>
-                        </li>
-                    </ul> -->
                 </div>
                 <button ng-click="panel='addgold'">Add Gold</button>
                 <button ng-click="panel='addchar'">Add Character</button><br>
@@ -124,7 +121,22 @@
                 <!-- This div's content is swapped out -->
                 <div ng-switch on="panel">
                     <!-- add Gold panel-->
+
                     <div ng-switch-when="addgold">
+                        <form ng-submit="addDonation()">
+                            <label for="amount">Amount:</label><br>
+                            <input type="text" name="amount" ng-model="nd.amount">
+                            <label for="method">Method:</label><br>
+                            <select class="select-css" name="method" ng-model="nd.method">
+                                <option value="cash" default>Cash</option>
+                                <option value="online">Online</option>
+                            </select>
+                            <input type="submit" value="Submit">
+                        </form>
+                    </div>
+
+
+                    <!-- <div ng-switch-when="addgold">
                         <form ng-submit="addDonation()">
                             <label>Amount: <input type="text" ng-model="nd.amount"/></label><br/>
                             <label>Method: 
@@ -134,12 +146,13 @@
                                 </select></label><br/>
                             <input type="submit" value="Submit" />
                         </form>
-                    </div>
+                    </div> -->
+
                     <!-- add char -->
                     <div ng-switch-when="addchar">
-                        <h4>add char</h4>
+                        <h3>Add New Character</h3>
                         <form novalidate ng-submit="createCharacter()">
-                          <label>Character Name: <input type="text" ng-model="character.name"/></label><br/>
+                          <label>Character Name: </label> <input type="text" ng-model="character.name"/><<br>
                           <label>Race:<select ng-model="character.race">
                               <option selected>Dragonborn</option>
                               <option>Drow</option>
