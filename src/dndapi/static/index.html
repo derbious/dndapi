@@ -26,9 +26,9 @@
                     <fieldset>
                         <form novalidate ng-submit="doLogin(user)">
                             <label for="user-name">Username:</label><br>
-                            <input style="text-align: center" type="text" name="user-name" ng-model="user.username"/><br>
+                            <input type="text" name="user-name" ng-model="user.username"/><br>
                             <label for="pass-word">Password:</label><br>
-                            <input style="text-align: center" type="password" name="pass-word" ng-model="user.password"/><br>
+                            <input type="password" name="pass-word" ng-model="user.password"/><br>
                             <input type="submit" value="Login">
                         </form>
                     </fieldset>
@@ -89,12 +89,12 @@
                     </table>
 
                     
-                
+                    <!-- donor characters-->
 
                     <div id="donchars">
                         <h3>Characters</h3>
 
-                        <table id="chartable">
+                        <table>
                             <tr ng-repeat="c in current_donor_characters">
                                 <td>Character: </td>
                                 <td>{{c.name}}</td>
@@ -103,7 +103,7 @@
                                 <td>Class:</td>
                                 <td>{{c.class}}</td>
                                 <td>{{c.state}}</td>
-                                <td>
+                                <td style="background-color: #8286A0; font-size: .75em;">
                                     <button class="qbtn" ng-show="c.state=='queued';" ng-click="removeFromQueue(c.id);">Remove from queue</button>
                                     <button class="qbtn" ng-show="c.state=='removed';" ng-click="unremoveFromQueue(c.id);">Add back to queue</button>
                                 </td> 
@@ -113,8 +113,8 @@
                     
 
                 </div>
-                <div class="donops">
-                    <h3>Donor Operations</h3><br>
+
+                <div class="opsbuttons">
                     <button ng-click="panel='addgold'">Add Gold</button>
                     <button ng-click="panel='addchar'">Add Character</button>
                     <button ng-click="panel='addboon'" ng-disabled="current_donor.available_gold < 5.0">Purchase Boon</button>
@@ -184,25 +184,70 @@
                     </div>
 
 
-                    <!-- add boon -->
+                    <!-- buy boon -->
                     <div ng-switch-when="addboon">
-                        <h4>purchase boon</h4>
-                        <form ng-submit="addPurchase('boon')">
-                            <label><input type="radio" ng-model="boonamt" value="5" name="boonamt">$5 (random draw)</label><br>
-                            <label><input type="radio" ng-model="boonamt" value="15" name="boonamt" ng-disabled="current_donor.available_gold < 15.0">$15 (Select from lower table)</label><br>
-                            <label><input type="radio" ng-model="boonamt" value="30" name="boonamt" ng-disabled="current_donor.available_gold < 30.0">$30 (Select from current table)</label><br>
-                            <input type="submit" value="purchase"/>
+                        <h3>Purchase Boon</h3>
+
+                        <form ng-submit="addPurchase('boon')">    
+                        <ul>
+                            <li>
+                              <input type="radio" ng-model="booamt" value="5" id="f-option" name="selector">
+                              <label for="f-option">5 Gold: Randomly drawn Boon from the current Peril Level</label>
+                              
+                              <div class="check"></div>
+                            </li>
+                            
+                            <li>
+                              <input type="radio" ng-model="boonamt" value="15" id="s-option" name="selector" ng-disabled="current_donor.available_gold < 15.0">
+                              <label for="s-option">15 Gold: Choose a specific Boon from a lower Peril Level</label>
+                              
+                              <div class="check"><div class="inside"></div></div>
+                            </li>
+                            
+                            <li>
+                              <input type="radio" ng-model="boonamt" value="30" id="t-option" name="selector" ng-disabled="current_donor.available_gold < 30.0">
+                              <label for="t-option">30 Gold: Choose a specific Boon from the current Peril Level</label>
+                              
+                              <div class="check"><div class="inside"></div></div>
+                            </li>
+                          </ul>
+                          <input type="submit" value="Purchase">
                         </form>
+                          
                     </div>
-                    <!-- add bane -->
+
+
+                    <!-- buy bane -->
+                    
                     <div ng-switch-when="addbane">
-                        <h4>purchase bane</h4>
-                        <form ng-submit="addPurchase('bane')">
-                            <label><input type="radio" name="baneamt" ng-model="baneamt" value="5">$5 (random draw)</label><br>
-                            <label><input type="radio" name="baneamt" ng-model="baneamt" value="15" ng-disabled="current_donor.available_gold < 15.0">$15 (Select from lower table)</label><br>
-                            <label><input type="radio" name="baneamt" ng-model="baneamt" value="30" ng-disabled="current_donor.available_gold < 30.0">$30 (Select from current table)</label><br>
-                            <input type="submit" value="purchase">
+                        <h3>Purchase Bane</h3>
+
+                        <form ng-submit="addPurchase('bane')">    
+                        <ul>
+                            <li>
+                              <input type="radio" ng-model="baneamt" value="5" id="f-option" name="selector">
+                              <label for="f-option">5 Gold: Randomly drawn Bane from the current Peril Level</label>
+                              
+                              <div class="check"></div>
+                            </li>
+                            
+                            <li>
+                              <input type="radio" ng-model="baneamt" value="15" id="s-option" name="selector" ng-disabled="current_donor.available_gold < 15.0">
+                              <label for="s-option">15 Gold: Choose a specific Bane from a lower Peril Level</label>
+                              
+                              <div class="check"><div class="inside"></div></div>
+                            </li>
+                            
+                            <li>
+                              <input type="radio" ng-model="baneamt" value="30" id="t-option" name="selector" ng-disabled="current_donor.available_gold < 30.0">
+                              <label for="t-option">30 Gold: Choose a specific Bane from the current Peril Level</label>
+                              
+                              <div class="check"><div class="inside"></div></div>
+                            </li>
+                          </ul>
+                          <input type="submit" value="Purchase">
                         </form>
+                          
                     </div>
                 </div>
             </div>
