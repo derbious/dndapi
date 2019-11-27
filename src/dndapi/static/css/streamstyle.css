@@ -4,13 +4,13 @@
 
 .rgba-primary-0 { color: rgba(163, 28, 28,1) }	/* Main Primary color */
 .rgba-primary-1 { color: rgba(255, 88, 88,1) }
-.rgba-primary-2 { color: rgba(219, 52, 52,1) }
+.rgba-primary-2 { color: rgb(143, 63, 63, 1) }
 .rgba-primary-3 { color: rgba(104,  4,  4,1) }
 .rgba-primary-4 { color: rgba( 58,  3,  3,1) }
 
 /* layout */ 
 
-html, body, {
+html, body {
     margin: 0;
 }
 
@@ -22,7 +22,7 @@ body {
 }
 
 .box {
-    background-color: rgba(219, 52, 52,1);
+    background-color: rgb(143, 63, 63);
     padding: .25em;
     border-radius: 10px;
     box-shadow: 3px 5px rgb(37, 4, 4)
@@ -32,10 +32,10 @@ body {
     display: grid;
     gap: 1em;
     grid-template-areas: 
-    "hd hd hd li"
-    "ti ti ti kc"
-    "on on on qc"
-    "on on on qc"
+    "hd hd li"
+    "ti ti ti"
+    "on on qc"
+    "on on qc"
 }
 
 .hd {
@@ -82,6 +82,56 @@ body {
           
 }
 
+/* login modal */
+
+.logmodal {
+    position: fixed;
+    font-family: "PT Sans";
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: rgba(0 , 0, 0, .85);
+    z-index: 99999;
+    opacity: 1;
+    transition: opacity 400ms ease-in;
+    
+}
+
+.logmodal > div {
+    width: 400px;
+    position: relative;
+    margin: 10% auto;
+    padding: 5px 20px 13px 20px;
+    border-radius: 10px;
+    background: rgb(143, 63, 63);
+    color: white;
+}
+
+#un, #pw {
+    font-family: "PT Sans";
+    font-size: 1.5em;
+}
+
+
+
+.close {
+	background: #606061;
+	color: #FFFFFF;
+	line-height: 25px;
+	position: absolute;
+	right: -12px;
+	text-align: center;
+	top: -10px;
+	width: 24px;
+	text-decoration: none;
+	font-weight: bold;
+	border-radius: 12px;
+	box-shadow: 1px 1px 3px #000;
+}
+
+.close:hover { background: #00d9ff; }
+
 /* global */ 
 
 h1, h2, h3, h4, h5, h6 {
@@ -102,7 +152,7 @@ p {
 
 button {
     font-family: "Press Start 2P";
-    background-color: rgba(104,  4,  4,1)
+    background-color: rgba(104,  4,  4,1);
     color: white;
     font-size: 1.15em;
     padding: 8px;
@@ -113,12 +163,12 @@ button {
 
 button:hover {
     background-color: white;
-    color: rgba(104,  4,  4,1)
+    color: rgba(104,  4,  4,1);
     border: 5px solid rgba(104,  4,  4,1); 
 }
 
 button:active {
-    background-color: rgba(37, 7, 7, 0.918)
+    background-color: rgba(37, 7, 7, 0.918);
     color: white;
     border: 5px solid rgba(104,  4,  4, 1);
 }
@@ -135,6 +185,10 @@ label {
     font-weight: bold;
     margin-left: 5px;
     
+}
+
+fieldset {
+    border: none;
 }
 
 .select-css {
@@ -186,3 +240,19 @@ label {
     font-weight: bold;
     font-size: 1.75em;
 }
+
+/* specific */
+
+.killa {
+    height: 50px;
+    width: 50px;
+    border-radius: 10px;
+    background-color: rgba(255, 88, 88,1);
+    color: rgba( 58,  3,  3,1);    
+}
+
+.killa > p {
+    font-family: "Creepster";
+    font-size: 2.5em;
+}
+
