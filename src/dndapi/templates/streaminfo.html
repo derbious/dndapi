@@ -5,9 +5,20 @@
     <title>DnDonations Stream information</title>
     <link href="https://fonts.googleapis.com/css?family=PT+Sans|Press+Start+2P&display=swap" rel="stylesheet">
     <style>
+        @font-face {
+            font-family: 'Gold Box';
+            src: url('/css/goldbox.woff') format("woff");
+        } 
         body {
             background-color: black;
             color: white;
+        }
+        .gb {
+            font-family: 'Gold Box';
+            font-size: 24px;
+        }
+        .p2 {
+            font-family: 'Press Start 2P', cursive;
         }
     </style>
     <script type="text/javascript">
@@ -15,12 +26,14 @@
         function updateContent () {
             document.getElementById('content').innerHTML = this.responseText;
         }
-        setInterval(function(){
+        function loadContent() {
             var oReq = new XMLHttpRequest();
             oReq.addEventListener("load", updateContent);
             oReq.open("GET", url);
             oReq.send();
-        }, 5000);
+        }
+        setInterval(loadContent, 5000);
+        loadContent();
      </script>
 </head>
 <body>
