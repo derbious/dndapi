@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/streamstyle.css">
     <link href="https://fonts.googleapis.com/css?family=PT+Sans|Press+Start+2P&display=swap" rel="stylesheet">
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.8/angular.min.js"></script>
     <script src="js/dndonations.js"></script>
@@ -24,25 +24,55 @@
                     <h2>Please Log In</h2>
                     <fieldset>
                         <form novalidate ng-submit="doLogin(user)">
-                            <label>Username: <input type="text" ng-model="user.username"/></label><br/>
-                            <label>Password: <input type="password" ng-model="user.password"/></label><br/>
-                            <input type="submit" value="Login" />
+                            <label for="user-name">Username:</label><br>
+                            <input type="text" name="user-name" ng-model="user.username"/><br>
+                            <label for="pass-word">Password:</label><br>
+                            <input type="password" name="pass-word" ng-model="user.password"/><br>
+                            <input type="submit" value="Login">
                         </form>
                     </fieldset>
                 </div>
             </div>
         </div>
+        <!-- STREAM OPS, all content must remain inside this controller div -->
         <div ng-controller="StreamController">
-            <!-- Stream Ops -->
-            <div class="box dn">
-                {{error_msg}}
+
+            <!-- ticker panel -->
+            <h3>Current Ticker Message</h3><br>
+            <span class="onscreen">{{current_stream_msg}}</span><br>
+            <div class="box ti">
+                <span class="error">{{error_msg}}</span>
+                <form ng-submit="setTicker();">
+                    <input type="text" ng-model="stream_ticker" placeholder="Please input message for stream ticker.">
+                    <input type="submit" value="Change Ticker">
+                </form>
+            </div>
+
+            <!-- Current DM, Team, and Goal -->
+            <div class="box on">
                 <div>
-                    <form ng-submit="setTicker();">
-                        <input type="text" ng-model="stream_ticker"></input>
-                        <input type="submit" value="Change Ticker" />
+                    <h3>Current Dungeon Master</h3>
+                    <p><span class="onscreen">{{current_dm.name}}</span> of team <span class="onscreen">{{current_dm.team}}</span> <br> 
+                    <form ng-submit="regNewDm()">
+                        <label for="chgdm">New DM:</label>
+                        <input type="text" name="chgdm" ng-model="newdm.name" placeholder="name">
+                        <label for="chgtm">Team:</label>
                     </form>
                 </div>
                 <div>
+                    
+                </div>
+                <div>
+                    <h3>Current Kill Count</h3>
+                    <span class="onscreen">{{current_dm.numkills}} </span>
+                </div>
+            </div>
+            
+            
+
+
+            
+                    <!-- DM, Team, Killcount box -->
                     <div>Current DM Name: {{current_dm.name}}</div>
                     <div>Team: {{current_dm.team}}</div>
                     <div>Kills: {{current_dm.numkills}}</div>
@@ -58,6 +88,7 @@
                     </form>
                 </div>
                 <div>
+                    <!-- next goal selector -->
                     <form ng-submit="setNextgoal()">
                         <select ng-model="nextgoal">
                             <option>$750</option>
@@ -75,8 +106,8 @@
                         <input type="submit" value="Submit" />
                 </div>
             </div>
-
-            <div class="box cc">
+            <!-- currently displayed on stream-->
+            <div class="box cd">
                 <h2>Rendered results here</h2>
                 <div>Current Stream Message: {{current_stream_msg}}</div>
                 <div>NewDM JSON: {{newdm | json}}</div>
