@@ -4,18 +4,21 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="css/streamstyle.css">
-    <link href="https://fonts.googleapis.com/css?family=Creepster|PT+Sans|Press+Start+2P&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=PT+Sans|Press+Start+2P&display=swap" rel="stylesheet">
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.8/angular.min.js"></script>
     <script src="js/dndonations.js"></script>
-    <title>DnDonations Streaming Console</title>
+    <!-- Load the Twitch embed script -->
+    <script src="https://embed.twitch.tv/embed/v1.js"></script>
+    <link rel="stylesheet" href="css/streamstyle.css">
+    <title>DnDonations Registration Console</title>
 </head>
 
 <body>
+
     <div class="grid-container">
 
-        <!-- header and good good login boye -->
-        <div class="box hd"><h1>DnDonations Registration Console</h1></div>
+        <!-- header and login -->
+        <div class="box hd"><h1>Dndonations Streaming Console</h1></div>
         <div class="box li" ng-controller="LoginController">
             <a href="" ng-click="show_modal = true;" ng-show="login_successful==false">Login</a>
             <span ng-show="login_successful">Logged in 🌮</span>
@@ -36,113 +39,53 @@
                 </div>
             </div>
         </div>
-        <!-- STREAM OPS, all content must remain inside this controller div -->
-        <div ng-controller="StreamController">
 
+        <!-- STREAM OPS CONTROLLER, all remaining content must remain within this div -->
+        <div class="streamops mn" ng-controller="StreamController">
+            
             <!-- ticker panel -->
-            <div class="box ti">
-                <h3>Current Ticker Message</h3><br>
-                <span class="onscreen">{{current_stream_msg}}</span><br>
-                  <span class="error">{{error_msg}}</span>
+            <div class="box ti" id="tickpan">
+                <p>Current Ticker Message:</p>
+                <p><span class="onscreen ugh">{{current_stream_msg}}</span></p>
                 <form ng-submit="setTicker();">
                     <input type="text" ng-model="stream_ticker" placeholder="Please input message for stream ticker.">
                     <input type="submit" value="Change Ticker">
                 </form>
-            </div>
-
-            <!-- Current DM/team, Kills, and Goal -->
-            <div class="box on">
-                <div>
-                    <h3>Current Dungeon Master</h3>
-                    <p><span class="onscreen">{{current_dm.name}}</span> of team <span class="onscreen">{{current_dm.team}}</span> <br> 
-                    <form ng-submit="regNewDm()">
-                        <label for="chgdm">New DM:</label>
-                        <input type="text" name="chgdm" ng-model="newdm.name" placeholder="name">
-                        <label for="chgtm">Team:</label>
-                        <select name="chgtm" ng-model="newdm.team">
-                            <option value="duskpatrol">Duskpatrol</option>
-                            <option value="moonwatch">Moonwatch</option>
-                            <option value="sunguard">Sunguard️</option>
-                        </select>
-                    </form>                    
-                </div>
-                <div>
-                    <h3>Kills:</h3>
-                    <div class="killa">
-                        <p>{{current_dm.numkills}}</p>
-                    </div>
-                </div>
                 
             </div>
-            
-            
-
-
-            
-                    <!-- DM, Team, Killcount box -->
-                    <!-- <div>Current DM Name: {{current_dm.name}}</div>
-                    <div>Team: {{current_dm.team}}</div>
-                    <div>Kills: {{current_dm.numkills}}</div>
-                    <form ng-submit="regNewDm()">
-                        <label>Name:<input type="text" ng-model="newdm.name"></input></label>
-                        <label>Team:
-                        <select ng-model="newdm.team">
-                        <option value="duskpatrol">Duskpatrol</option>
-                        <option value="moonwatch">Moonwatch</option>
-                        <option value="sunguard">Sunguard️</option>
-                        </select></label>
-                        <input type="submit" value="Submit" />
-                    </form>
-                </div> -->
-                <div>
-                    <!-- next goal selector -->
-                    <form ng-submit="setNextgoal()">
-                        <select ng-model="nextgoal">
-                            <option>$750</option>
-                            <option>$1000</option>
-                            <option>$1250</option>
-                            <option>$1500</option>
-                            <option>$2000</option>
-                            <option>$2500</option>
-                            <option>$3000</option>
-                            <option>$4000</option>
-                            <option>$5000</option>
-                            <option>$7500</option>
-                            <option>$10000</option>
-                        </select>
-                        <input type="submit" value="Submit" />
-                </div>
+        
+            <!-- dm team kills panel -->
+            <div class="box dm">
+                this is the dm box
             </div>
-            <!-- currently displayed on stream-->
-            <!-- <div class="box cd">
-                <h2>Rendered results here</h2>
-                <div>Current Stream Message: {{current_stream_msg}}</div>
-                <div>NewDM JSON: {{newdm | json}}</div>
-                <div>next goal: {{current_nextgoal}}</div>
+
+            <!-- kill count panel -->
+            <!-- <div class="box kc">
+                kills
             </div> -->
 
-            <div class="box qc" ng-controller="QueueController">
-                <h2>Playing</h2>
-                <table>
-                    <tr ng-repeat="n in [].constructor(6) track by $index">
-                        <td>P{{$index+1}}</td>
-                        <td colspan="5" ng-show="queue.playing[$index] === null">
-                          <select ng-options="character.name for character in queue.waiting track by character.id" ng-model="selected[$index]"></select>
-                          <button ng-click="seatPlayer($index);">start</button>
-                        </td>
-                        <td ng-show="queue.playing[$index] !== null">{{ queue.playing[$index].name }}</td>
-                        <td ng-show="queue.playing[$index] !== null">{{ queue.playing[$index].race }}</td>
-                        <td ng-show="queue.playing[$index] !== null">{{ queue.playing[$index].class }}</td>
-                        <td ng-show="queue.playing[$index] !== null">resses: {{ queue.playing[$index].num_resses}} </td>
-                        <td ng-show="queue.playing[$index] !== null">
-                            <button ng-click="resPlayer($index);">Res (${{ Math.pow(2,Number(queue.playing[$index].num_resses))*5 }})</button>
-                            <button ng-click="killPlayer($index);">kill</button>
-                        </td>
-                    </tr>
-                </table>
+            <!-- queue controller panel -->
+            <div class="box qu">
+                this is the queue controller
             </div>
-            <div>{{queue | json }}</div>
+
+            <!-- twitch monitor panel -->
+            <div class='twitchWrapper tw box'>
+                <div class='twitchStream'>
+                    <iframe src="https://player.twitch.tv/?channel=thewyvernstale" frameborder="0" scrolling="no"></iframe>
+                </div>
+                <div class='twitchChat tc'>
+                    <iframe frameborder="0" scrolling="no" src="https://www.twitch.tv/embed/thewyvernstale/chat"></iframe>
+                </div>
+            </div>
+
+            
+        <!-- END STREAM OPS CONTROLLER DIV -->    
         </div>
+
+    <!-- END GRID CONTAINER-->
     </div>
+
+
 </body>
 </html>

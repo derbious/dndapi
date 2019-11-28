@@ -28,52 +28,65 @@ body {
     box-shadow: 3px 5px rgb(37, 4, 4)
 }
 
-.grid-container {
+.headboye {
     display: grid;
     gap: 1em;
     grid-template-areas: 
-    "hd li"
-    "mn mn"
+    "hd hd hd li"
+    "mn mn mn mn";
+    
+}
+
+.hd {
+    grid-area: hd;
+}
+
+.li {
+    grid-area: li;
+    display: flex;
+    justify-content: center;
+    align-items: center;  
+    font-family: "Press Start 2P";
+    
 }
 
 .mn {
-    grid-area: mn;
     display: grid;
     gap: 1em;
     grid-template-areas: 
-    "ti tw ch"
-    "dm tw ch"
-    "qu tw ch";
-
-    /* "ti tw tw tw"
-    "dm tw tw tw"
-    "qu tw tw tw"; */
-   
-    
+    "ti ti ti"
+    "on on gl"
+    "on on qc";
 }
 
 .ti {
     grid-area: ti;
 }
 
-/* .kc {
+.kc {
     grid-area: kc;
-} */
-
-.dm {
-    grid-area: dm;
 }
 
-.qu {
-    grid-area: qu;
+.on {
+    grid-area: on;
 }
 
-.tw {
-    grid-area: tw;
+.qc {
+    grid-area: qc;
 }
 
-.tc {
-    grid-area: tx;
+@media only screen and (max-width: 700px) {
+    .grid-container {
+        grid-template-areas: 
+        "hd"
+        "li"
+        "on"
+        "ti"
+        "cg"
+        "qc"        
+    }
+
+          
 }
 
 /* login modal */
@@ -124,7 +137,7 @@ body {
 
 .close:hover { background: #00d9ff; }
 
-/* global */
+/* global */ 
 
 h1, h2, h3, h4, h5, h6 {
     font-family: "Press Start 2P";
@@ -133,12 +146,12 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 p {
-    font-family: "Press Start 2P";
-    font-size: 1.25em;
+    font-size: 1.15em;
+    color: rgba(255, 88, 88,1);
 }
 
 .onscreen {
-    font-family: "PT Sans";
+    font-weight: bold;
     font-size: 1.25em;
 }
 
@@ -208,12 +221,15 @@ fieldset {
     background-position: right .7em top 50%, 0 0;
     background-size: .65em auto, 100%;
 }
+
 .select-css::-ms-expand {
     display: none;
 }
+
 .select-css:hover {
     border-color: #888;
 }
+
 .select-css:focus {
     border-color: #aaa;
     box-shadow: 0 0 1px 3px rgba(88, 58, 172, 0.699);
@@ -221,9 +237,17 @@ fieldset {
     color: #222; 
     outline: none;
 }
+
 .select-css option {
     font-weight:normal;
     font-size: 1.15em;
+}
+
+.error {
+    background-color: whitesmoke;
+    color: red;
+    font-weight: bold;
+    font-size: 1.75em;
 }
 
 input[type=submit] {
@@ -261,80 +285,18 @@ input[type=text], input[type=password], input[type=search], input[type=email]{
     border-radius: .5em;
   }
 
-.error {
-    background-color: whitesmoke;
-    color: red;
-    font-weight: bold;
-    font-size: 1.75em;
+/* specific */
+
+.killa {
+    height: 50px;
+    width: 50px;
+    border-radius: 10px;
+    background-color: rgba(255, 88, 88,1);
+    color: rgba( 58,  3,  3,1);    
 }
 
-.onscreen {
-    background-color: rgb(236, 208, 208);
-    color: rgba(104,  4,  4,1);
-    font-size: 1.15em;
+.killa > p {
+    font-family: "Creepster";
+    font-size: 2.5em;
 }
 
-.ugh {
-    padding-left: 5px;
-}
-
-#tickpan >input[type=text] {
-    width: 350px;
-    padding: 5px;
-    margin: 5px;
-    display: inline-block;
-    border: 1px solid #ccc;
-    box-sizing: border-box;
-    font-family: "PT Sans";
-    font-size: 1.15em;
-    border-radius: .5em;
-}
-
-/* twitch embed */
-
-
-
-/* commenting out working twitc css 
-
-.twitchWrapper {
-    position: relative;
-    height: 650px;
-}
-
-.twitchStream {
-	position: relative;
-	width:75%;
-}
-
-.twitchStream:before{
-	content: "";
-	display: block;
-	padding-top: 56.25%; /* 16:9 
-}
-
-.twitchChat{
-	position: absolute;
-    top: 0;
-    bottom: 0;
-    right: 0;
-	width: 25%;
-}
-
-.twitchStream iframe, .twitchChat iframe {
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-}
-
-*/
-
-@media (max-width: 1024px) {
-	.twitchStream{
-		width:100%;
-	}
-	.twitchChat{
-		display:none;
-	}
-}
