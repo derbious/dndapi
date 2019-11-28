@@ -76,11 +76,35 @@ h1, h2, h3, h4, h5, h6 {
     padding: 0;
 }
 
+a.button {
+    text-decoration: none;
+    font-family: "Press Start 2P";
+    background-color: rgba(80, 65, 108, .85);
+    color: white;
+    font-size: 1.15em;
+    padding: 8px;
+    border: 5px solid transparent;
+    outline: 0;
+    cursor: pointer;
+}
+
+a.button:hover {
+    background-color: white;
+    color: rgba(80, 65, 108, .85);
+    border: 5px solid rgba(80, 65, 108, .85);
+}
+
+a.button:active {
+    background-color: rgba( 40, 25, 69,1);
+    color: white;
+    border: 5px solid white;
+}
+
 button {
     font-family: "Press Start 2P";
     background-color: rgba(80, 65, 108, .85);
     color: white;
-    font-size: 1em;
+    font-size: 1.15em;
     padding: 8px;
     border: 5px solid transparent;
     outline: 0;
@@ -113,13 +137,16 @@ label {
     
 }
 
-
+.lis {
+    font-family: "Press Start 2P";
+    font-size: 1.15em;
+}
 
 input[type=submit] {
     font-family: "Press Start 2P";
     background-color: rgba(80, 65, 108, .85);
     color: white;
-    font-size: 1.25em;
+    font-size: 1.15em;
     padding: 8px;
     border: 5px solid transparent;
     outline: 0;
@@ -147,7 +174,7 @@ input[type=text], input[type=password], input[type=search], input[type=email]{
     border: 1px solid #ccc;
     box-sizing: border-box;
     font-family: "PT Sans";
-    font-size: 1.5em;
+    font-size: 1.15em;
     border-radius: .5em;
   }
 

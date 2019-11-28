@@ -1,0 +1,415 @@
+
+/* Palette color codes */
+/* Palette URL: http://paletton.com/#uid=15D0w0kqxkukVN-orryuId6uw7k */
+
+.rgba-primary-0 { color: rgba(163, 28, 28,1) }	/* Main Primary color */
+.rgba-primary-1 { color: rgba(255, 88, 88,1) }
+.rgba-primary-2 { color: rgb(143, 63, 63, 1) }
+.rgba-primary-3 { color: rgba(104,  4,  4,1) }
+.rgba-primary-4 { color: rgba( 58,  3,  3,1) }
+
+/* layout */ 
+
+body {
+    background-color: rgba( 58,  3,  3,1);
+    color: white;
+    font-family: "PT Sans";
+    font-size: 1.25em;
+}
+
+.box {
+    background-color: rgb(143, 63, 63);
+    padding: .25em;
+    border-radius: 10px;
+    box-shadow: 3px 5px rgb(37, 4, 4)
+}
+
+.grid-container {
+    display: grid;
+    gap: 1em;
+    grid-template-areas: 
+    "hd li"
+    "mn mn"
+}
+
+.hd {
+    grid-area: hd;
+}
+
+.li {
+    grid-area: li;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.mn {
+    grid-area: mn;
+    display: grid;
+    gap: 1em;
+    grid-template-areas: 
+    /* "ti ti ti ti"
+    "dm dm dm gl"
+    "qu qu qu qu"
+    "tw tw tw tw"; */
+
+    "ti ti ti ti"
+    "tw tw tw tw"
+    "qu qu qu qu"
+    "dm dm dm gl";
+    
+    /* "dm dm dm gl"
+    "ti ti ti ti"
+    "tw tw tw tw"
+    "qu qu qu qu"; */
+}
+
+.ti {
+    grid-area: ti;
+}
+
+.dm {
+    grid-area: dm;    
+}
+
+.gl {
+    grid-area: gl;
+    padding-top: 25px;
+    padding-left: 8px;
+}
+
+.qu {
+    grid-area: qu;
+}
+
+.tw {
+    grid-area: tw;
+}
+
+/* login modal */
+
+.logmodal {
+    position: fixed;
+    font-family: "PT Sans";
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: rgba(0 , 0, 0, .85);
+    z-index: 99999;
+    opacity: 1;
+    transition: opacity 400ms ease-in;
+    
+}
+
+.logmodal > div {
+    width: 400px;
+    position: relative;
+    margin: 10% auto;
+    padding: 5px 20px 13px 20px;
+    border-radius: 10px;
+    background: rgb(143, 63, 63);
+    color: white;
+}
+
+#un, #pw {
+    font-family: "PT Sans";
+    font-size: 1.5em;
+}
+
+.close {
+	background: #606061;
+	color: #FFFFFF;
+	line-height: 25px;
+	position: absolute;
+	right: -12px;
+	text-align: center;
+	top: -10px;
+	width: 24px;
+	text-decoration: none;
+	font-weight: bold;
+	border-radius: 12px;
+	box-shadow: 1px 1px 3px #000;
+}
+
+.close:hover { background: #00d9ff; }
+
+.lis {
+    font-family: "Press Start 2P";
+    font-size: 1.15em;
+}
+
+.tip {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: .8em;
+}
+
+/* global */
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: "Press Start 2P";
+    color: white;
+    padding: 0 0 0 8px;
+}
+
+p {
+    font-family: "Press Start 2P";
+    font-size: 1.15em;
+}
+
+.onscreen {
+    font-family: "PT Sans";
+    font-size: 1.15em;
+}
+
+button {
+    font-family: "Press Start 2P";
+    background-color: rgba(104,  4,  4,1);
+    color: white;
+    font-size: 1.15em;
+    padding: 8px;
+    border: 5px solid transparent;
+    outline: 0;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: white;
+    color: rgba(104,  4,  4,1);
+    border: 5px solid rgba(104,  4,  4,1); 
+}
+
+button:active {
+    background-color: rgba(37, 7, 7, 0.918);
+    color: white;
+    border: 5px solid rgba(104,  4,  4, 1);
+}
+
+button:disabled,
+button[disabled]{
+  border: 1px solid #999999;
+  background-color: #cccccc;
+  color: #666666;
+}
+
+a.button {
+    text-decoration: none;
+    font-family: "Press Start 2P";
+    background-color: rgba(104, 4, 4,1);
+    color: white;
+    font-size: 1.15em;
+    padding: 8px;
+    border: 5px solid transparent;
+    outline: 0;
+    cursor: pointer;    
+}
+
+a.button:hover {
+    background-color: white;
+    color: rgba(104,  4,  4,1);
+    border: 5px solid rgba(104,  4,  4,1); 
+}
+
+a.button:active {
+    background-color: rgba(37, 7, 7, 0.918);
+    color: white;
+    border: 5px solid rgba(104,  4,  4, 1);
+}
+
+label {
+    font-size: 1.15em;
+    font-weight: bold;
+    margin-left: 5px;
+    
+}
+
+fieldset {
+    border: none;
+}
+
+.select-css {
+    display: block;
+    font-size: 16px;
+    font-family: sans-serif;
+    font-weight: 700;
+    color: #444;
+    line-height: 1.3;
+    padding: .6em 1.4em .5em .8em;
+    width: 80%;
+    max-width: 80%; 
+    box-sizing: border-box;
+    margin-left: 5px;
+    border: 1px solid #aaa;
+    box-shadow: 0 1px 0 1px rgba(0, 0, 0, 0.04);
+    border-radius: .5em;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    appearance: none;
+    background-color: #fff;
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007CB2%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E'),
+      linear-gradient(to bottom, #ffffff 0%,#e5e5e5 100%);
+    background-repeat: no-repeat, repeat;
+    background-position: right .7em top 50%, 0 0;
+    background-size: .65em auto, 100%;
+}
+.select-css::-ms-expand {
+    display: none;
+}
+.select-css:hover {
+    border-color: #888;
+}
+.select-css:focus {
+    border-color: #aaa;
+    box-shadow: 0 0 1px 3px rgba( 58,  3,  3,1);
+    box-shadow: 0 0 0 3px -moz-mac-focusring;
+    color: #222; 
+    outline: none;
+}
+.select-css option {
+    font-weight:normal;
+    font-size: 1.15em;
+}
+
+input[type=submit] {
+    font-family: "Press Start 2P";
+    background-color: rgba(104, 4,  4,1);
+    color: white;
+    font-size: 1.15em;
+    padding: 8px;
+    border: 5px solid transparent;
+    outline: 0;
+    cursor: pointer;
+}
+
+input[type=submit]:hover {
+    background-color: white;
+    color: rgba(104, 4,  4, 1);
+    border: 5px solid rgba(104, 4,  4, 1);   
+}
+
+input[type=submit]:active {
+    background-color: rgba( 58,  3,  3,1);
+    color: white;
+    border: 5px solid white;
+}
+
+input[type=text], input[type=password], input[type=search], input[type=email]{
+    width: 98%;
+    padding: 5px;
+    margin: 5px;
+    display: inline-block;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    font-family: "PT Sans";
+    font-size: 1.15em;
+    border-radius: .5em;
+  }
+
+.error {
+    background-color: whitesmoke;
+    color: red;
+    font-weight: bold;
+    font-size: 1.75em;
+}
+
+.onscreen {
+    background-color: rgb(236, 208, 208);
+    color: rgba(104,  4,  4,1);
+    font-size: 1.65em;
+    padding: 2px 3px 2px 3px;
+}
+
+.ugh {
+    padding-left: 5px;
+}
+
+.killcount {     
+    background-color: rgb(236, 208, 208);
+    color: rgba(104, 4, 4,1);
+    padding: 0px 20px;
+    text-align:center;
+    font-family: "Creepster";
+    font-size: 2em;
+}
+
+#nowtickmsg {
+    padding: 5px;
+    margin: 2px;
+}
+
+table, th , td {
+    font-family: "PT Sans";
+    font-size: 1.15em;
+    padding: 5px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+  
+table tr:nth-child(odd) {
+    background-color: rgba( 58,  3,  3,1);
+    padding: 5px;
+  }
+  
+table tr:nth-child(even) {
+    background-color: rgb(143, 63, 63);
+    padding: 5px;
+  }
+
+.qutab tbody td:nth-child(1) {
+    font-family: "Press Start 2P"
+ }
+
+ .qutab tbody td:nth-child(6) {
+    font-family: "Press Start 2P"
+ }
+
+.defont {
+    font-family: "PT Sans";
+}
+
+/* twitch embed */
+
+
+.twitchWrapper {
+    position: relative;
+    /* height: 650px; */
+}
+
+.twitchStream {
+	position: relative;
+	width:75%;
+}
+
+.twitchStream:before{
+	content: "";
+	display: block;
+	padding-top: 56.25%; /* 16:9 */
+}
+
+.twitchChat{
+	position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+	width: 25%;
+}
+
+.twitchStream iframe, .twitchChat iframe {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+
+@media (max-width: 1024px) {
+	.twitchStream{
+		width:100%;
+	}
+	.twitchChat{
+		display:none;
+	}
+}

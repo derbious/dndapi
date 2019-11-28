@@ -4,19 +4,24 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="css/style.css">
-    <link href="https://fonts.googleapis.com/css?family=PT+Sans|Press+Start+2P&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Creepster|PT+Sans|Press+Start+2P&display=swap" rel="stylesheet">
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.8/angular.min.js"></script>
     <script src="js/dndonations.js"></script>
-    <title>DnDonations Streaming Console</title>
+    <!-- Load the Twitch embed script -->
+    <script src="https://embed.twitch.tv/embed/v1.js"></script>
+    <link rel="stylesheet" href="css/streamstyle.css">
+    <title>DnDonations Stream Console</title>
 </head>
 
 <body>
+
     <div class="grid-container">
-        <div class="box hd"><h1>DnDonations Streaming Console</h1></div>
+
+        <!-- header and login -->
+        <div class="box hd"><h1>Dndonations Streaming Console</h1></div>
         <div class="box li" ng-controller="LoginController">
-            <a href="" ng-click="show_modal = true;" ng-show="login_successful==false">Login</a>
-            <span ng-show="login_successful">Logged in 🌮</span>
+            <a class="button" href="" ng-click="show_modal = true;" ng-show="login_successful==false">Login</a>
+            <span class="lis" ng-show="login_successful">Logged in 🌮</span>
             <!-- login modal -->
             <div id="lm" class="logmodal" ng-show="show_modal">
                 <div>
@@ -24,87 +29,109 @@
                     <h2>Please Log In</h2>
                     <fieldset>
                         <form novalidate ng-submit="doLogin(user)">
-                            <label>Username: <input type="text" ng-model="user.username"/></label><br/>
-                            <label>Password: <input type="password" ng-model="user.password"/></label><br/>
-                            <input type="submit" value="Login" />
+                            <label for="user-name">Username:</label><br>
+                            <input type="text" name="user-name" ng-model="user.username"/><br>
+                            <label for="pass-word">Password:</label><br>
+                            <input type="password" name="pass-word" ng-model="user.password"/><br>
+                            <input type="submit" value="Login">
                         </form>
                     </fieldset>
+                    <p class="tip">Note: Log into Twitch by typing anything into the chat box and clicking "Chat". Use the official account!</p>
                 </div>
             </div>
         </div>
-        <div ng-controller="StreamController">
-            <!-- Stream Ops -->
-            <div class="box dn">
-                {{error_msg}}
-                <div>
+
+        <!-- STREAM OPS CONTROLLER, all other content must remain within this div -->
+        <div class="streamops mn" ng-controller="StreamController">
+            
+            <!-- ticker panel -->
+            <div class="box ti">
+                <p class="ugh">Current Ticker Message:                
+                <span class="onscreen ugh">{{current_stream_msg}}</span></p>
                     <form ng-submit="setTicker();">
-                        <input type="text" ng-model="stream_ticker"></input>
-                        <input type="submit" value="Change Ticker" />
-                    </form>
+                    <input id="streaminput" type="text" ng-model="stream_ticker" placeholder="Please input message for stream ticker.">
+                    <input type="submit" value="Change Ticker">
+                </form>                
+            </div>
+
+            <!-- next goal panel -->
+            <div class="box gl">                
+                <p class="ugh">Current Goal:<span class="onscreen">{{current_nextgoal}}</span></p>
+                <form ng-submit="setNextgoal()">                    
+                    <label for="glnow">Set new goal:</label>
+                    <select class="select-css" name="glnow" ng-model="nextgoal">
+                        <option>$750</option>
+                        <option>$1000</option>
+                        <option>$1250</option>
+                        <option>$1500</option>
+                        <option>$2000</option>
+                        <option>$2500</option>
+                        <option>$3000</option>
+                        <option>$4000</option>
+                        <option>$5000</option>
+                        <option>$7500</option>
+                        <option>$10000</option>
+                    </select><br>
+                    <input type="submit" value="Set Goal" />
+                </form>            
+            </div>
+        
+            <!-- dm team kills panel -->
+            <div class="box dm">                
+                <h3>Current Dungeon Master</h3>
+                <p class="ugh"><span class="onscreen">{{current_dm.name}}</span> of team <span class="onscreen">{{current_dm.team}}</span> with <span class="killcount">{{current_dm.numkills}}</span> kills!</p> 
+                <form ng-submit="regNewDm()">
+                    <label for="chgdm">New DM:</label>
+                    <input type="text" name="chgdm" ng-model="newdm.name" placeholder="name">
+                    <label for="chgdt">Team:</label>
+                    <select name="chgtm" class="select-css" ng-model="newdm.team">
+                        <option value="Dusk Patrol" selected>Duskpatrol</option>
+                        <option value="Moonwatch">Moonwatch</option>
+                        <option value="Sunguard">Sunguard️</option>
+                    </select>
+                    <input type="submit" value="Change DM">
+                </form><br>                    
+            </div>            
+
+            <!-- queue controller panel -->
+            <div class="box qu" ng-controller="QueueController">
+                    <h3>Playing</h3>
+                    <table class="qutab">
+                        <tr ng-repeat="n in [].constructor(6) track by $index">
+                            <td>P{{$index+1}}</td>
+                            <td colspan="5" ng-show="queue.playing[$index] === null">
+                              <select class="select-css" ng-options="character.name for character in queue.waiting track by character.id" ng-model="selected[$index]"></select>
+                              <button ng-click="seatPlayer($index);">Start</button>
+                            </td>
+                            <td ng-show="queue.playing[$index] !== null">{{ queue.playing[$index].name }}</td>
+                            <td ng-show="queue.playing[$index] !== null">{{ queue.playing[$index].race }}</td>
+                            <td ng-show="queue.playing[$index] !== null">{{ queue.playing[$index].class }}</td>
+                            <td ng-show="queue.playing[$index] !== null">Times Rezzed: <span class="defont">{{ queue.playing[$index].num_resses}}</span></td>
+                            <td ng-show="queue.playing[$index] !== null">
+                                <button ng-click="resPlayer($index);">Rez (${{ Math.pow(2,Number(queue.playing[$index].num_resses))*5 }})</button>
+                                <button ng-click="killPlayer($index);">Kill</button>
+                            </td>
+                        </tr>
+                    </table>
                 </div>
-                <div>
-                    <div>Current DM Name: {{current_dm.name}}</div>
-                    <div>Team: {{current_dm.team}}</div>
-                    <div>Kills: {{current_dm.numkills}}</div>
-                    <form ng-submit="regNewDm()">
-                        <label>Name:<input type="text" ng-model="newdm.name"></input></label>
-                        <label>Team:
-                        <select ng-model="newdm.team">
-                        <option value="duskpatrol">Duskpatrol</option>
-                        <option value="moonwatch">Moonwatch</option>
-                        <option value="sunguard">Sunguard️</option>
-                        </select></label>
-                        <input type="submit" value="Submit" />
-                    </form>
+
+            <!-- twitch panel -->
+            <div class='twitchWrapper tw box'>
+                <div class='twitchStream'>
+                    <iframe src="https://player.twitch.tv/?channel=thewyvernstale" frameborder="0" scrolling="no"></iframe>
                 </div>
-                <div>
-                    <form ng-submit="setNextgoal()">
-                        <select ng-model="nextgoal">
-                            <option>$750</option>
-                            <option>$1000</option>
-                            <option>$1250</option>
-                            <option>$1500</option>
-                            <option>$2000</option>
-                            <option>$2500</option>
-                            <option>$3000</option>
-                            <option>$4000</option>
-                            <option>$5000</option>
-                            <option>$7500</option>
-                            <option>$10000</option>
-                        </select>
-                        <input type="submit" value="Submit" />
+                <div class='twitchChat tc'>
+                    <iframe frameborder="0" scrolling="yes" id="DnDonations" src="https://www.twitch.tv/embed/thewyvernstale/chat"></iframe>
                 </div>
             </div>
 
-            <div class="box cc">
-                <h2>Rendered results here</h2>
-                <div>Current Stream Message: {{current_stream_msg}}</div>
-                <div>NewDM JSON: {{newdm | json}}</div>
-                <div>next goal: {{current_nextgoal}}</div>
-            </div>
-
-            <div class="box qc" ng-controller="QueueController">
-                <h2>Playing</h2>
-                <table>
-                    <tr ng-repeat="n in [].constructor(6) track by $index">
-                        <td>P{{$index+1}}</td>
-                        <td colspan="5" ng-show="queue.playing[$index] === null">
-                          <select ng-options="character.name for character in queue.waiting track by character.id" ng-model="selected[$index]"></select>
-                          <button ng-click="seatPlayer($index);">start</button>
-                        </td>
-                        <td ng-show="queue.playing[$index] !== null">{{ queue.playing[$index].name }}</td>
-                        <td ng-show="queue.playing[$index] !== null">{{ queue.playing[$index].race }}</td>
-                        <td ng-show="queue.playing[$index] !== null">{{ queue.playing[$index].class }}</td>
-                        <td ng-show="queue.playing[$index] !== null">resses: {{ queue.playing[$index].num_resses}} </td>
-                        <td ng-show="queue.playing[$index] !== null">
-                            <button ng-click="resPlayer($index);">Res (${{ Math.pow(2,Number(queue.playing[$index].num_resses))*5 }})</button>
-                            <button ng-click="killPlayer($index);">kill</button>
-                        </td>
-                    </tr>
-                </table>
-            </div>
-            <div>{{queue | json }}</div>
+            
+        <!-- END STREAM OPS CONTROLLER DIV -->    
         </div>
+
+    <!-- END GRID CONTAINER-->
     </div>
+
+
 </body>
 </html>
