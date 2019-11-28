@@ -10,10 +10,6 @@
 
 /* layout */ 
 
-html, body {
-    margin: 0;
-}
-
 body {
     background-color: rgba( 58,  3,  3,1);
     color: white;
@@ -52,8 +48,8 @@ body {
     display: grid;
     gap: 1em;
     grid-template-areas: 
-    "ti ti ti gl"
-    "dm dm dm dm"
+    "ti ti ti ti"
+    "dm dm dm gl"
     "qu qu qu qu"
     "tw tw tw tw";
 }
@@ -63,8 +59,13 @@ body {
 }
 
 .dm {
-    grid-area: dm;
-    /* display: flex; */
+    grid-area: dm;    
+}
+
+.gl {
+    grid-area: gl;
+    padding-top: 25px;
+    padding-left: 8px;
 }
 
 .qu {
@@ -308,9 +309,9 @@ input[type=text], input[type=password], input[type=search], input[type=email]{
 }
 
 .killcount {     
-    background-color: rgb(37, 4, 4);
-    color: white;
-    padding: 8px;
+    background-color: rgb(236, 208, 208);
+    color: rgba(104, 4, 4,1);
+    padding: 0px 20px;
     text-align:center;
     font-family: "Creepster";
     font-size: 2em;

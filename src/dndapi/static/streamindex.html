@@ -54,9 +54,9 @@
             </div>
 
             <!-- next goal panel -->
-            <div class="box gl">
+            <div class="box gl">                
                 <p class="ugh">Current Goal:<span class="onscreen">{{current_nextgoal}}</span></p>
-                <form ng-submit="setNextgoal()">
+                <form ng-submit="setNextgoal()">                    
                     <label for="glnow">Set new goal:</label>
                     <select class="select-css" name="glnow" ng-model="nextgoal">
                         <option>$750</option>
@@ -72,12 +72,13 @@
                         <option>$10000</option>
                     </select><br>
                     <input type="submit" value="Set Goal" />
+                </form>            
             </div>
         
             <!-- dm team kills panel -->
             <div class="box dm">                
                 <h3>Current Dungeon Master</h3>
-                <p class="ugh"><span class="onscreen">{{current_dm.name}}</span> of team <span class="onscreen">{{current_dm.team}}</span></p> 
+                <p class="ugh"><span class="onscreen">{{current_dm.name}}</span> of team <span class="onscreen">{{current_dm.team}}</span> with <span class="killcount">{{current_dm.numkills}}</span> kills!</p> 
                 <form ng-submit="regNewDm()">
                     <label for="chgdm">New DM:</label>
                     <input type="text" name="chgdm" ng-model="newdm.name" placeholder="name">
@@ -87,8 +88,7 @@
                         <option value="moonwatch">Moonwatch</option>
                         <option value="sunguard">Sunguard️</option>
                     </select>
-                </form>                    
-                <p class="ugh">Kills: <span class="killcount">{{current_dm.numkills}}</span></p>      
+                </form><br>                    
             </div>            
 
             <!-- queue controller panel -->
