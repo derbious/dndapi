@@ -322,6 +322,39 @@ input[type=text], input[type=password], input[type=search], input[type=email]{
     margin: 2px;
 }
 
+table, th , td {
+    font-family: "PT Sans";
+    font-size: 1.15em;
+    padding: 5px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+  
+table tr:nth-child(odd) {
+    background-color: rgba( 58,  3,  3,1);
+    padding: 5px;
+  }
+  
+table tr:nth-child(even) {
+    background-color: rgb(143, 63, 63);
+    padding: 5px;
+  }
+
+.qutab tbody td:nth-child(1) {
+    font-family: "Press Start 2P"
+ }
+
+ .qutab tbody td:nth-child(6) {
+    font-family: "Press Start 2P"
+ }
+
+.defont {
+    font-family: "PT Sans";
+}
+
 /* twitch embed */
 
 

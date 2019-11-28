@@ -93,21 +93,21 @@
 
             <!-- queue controller panel -->
             <div class="box qu" ng-controller="QueueController">
-                    <h2>Playing</h2>
-                    <table>
+                    <h3>Playing</h3>
+                    <table class="qutab">
                         <tr ng-repeat="n in [].constructor(6) track by $index">
                             <td>P{{$index+1}}</td>
                             <td colspan="5" ng-show="queue.playing[$index] === null">
-                              <select ng-options="character.name for character in queue.waiting track by character.id" ng-model="selected[$index]"></select>
-                              <button ng-click="seatPlayer($index);">start</button>
+                              <select class="select-css" ng-options="character.name for character in queue.waiting track by character.id" ng-model="selected[$index]"></select>
+                              <button ng-click="seatPlayer($index);">Start</button>
                             </td>
                             <td ng-show="queue.playing[$index] !== null">{{ queue.playing[$index].name }}</td>
                             <td ng-show="queue.playing[$index] !== null">{{ queue.playing[$index].race }}</td>
                             <td ng-show="queue.playing[$index] !== null">{{ queue.playing[$index].class }}</td>
-                            <td ng-show="queue.playing[$index] !== null">resses: {{ queue.playing[$index].num_resses}} </td>
+                            <td ng-show="queue.playing[$index] !== null">Times Rezzed: <span class="defont">{{ queue.playing[$index].num_resses}}</span></td>
                             <td ng-show="queue.playing[$index] !== null">
-                                <button ng-click="resPlayer($index);">Res (${{ Math.pow(2,Number(queue.playing[$index].num_resses))*5 }})</button>
-                                <button ng-click="killPlayer($index);">kill</button>
+                                <button ng-click="resPlayer($index);">Rez (${{ Math.pow(2,Number(queue.playing[$index].num_resses))*5 }})</button>
+                                <button ng-click="killPlayer($index);">Kill</button>
                             </td>
                         </tr>
                     </table>
