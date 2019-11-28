@@ -36,6 +36,7 @@
                             <input type="submit" value="Login">
                         </form>
                     </fieldset>
+                    <p class="tip">Note: Log into Twitch by typing anything into the chat box and clicking "Chat". Use the official account!</p>
                 </div>
             </div>
         </div>
@@ -82,12 +83,13 @@
                 <form ng-submit="regNewDm()">
                     <label for="chgdm">New DM:</label>
                     <input type="text" name="chgdm" ng-model="newdm.name" placeholder="name">
-                    <label for="chgtm">Team:</label>
+                    <label for="chgdt">Team:</label>
                     <select name="chgtm" class="select-css" ng-model="newdm.team">
-                        <option value="duskpatrol">Duskpatrol</option>
-                        <option value="moonwatch">Moonwatch</option>
-                        <option value="sunguard">Sunguard️</option>
+                        <option value="Dusk Patrol" selected>Duskpatrol</option>
+                        <option value="Moonwatch">Moonwatch</option>
+                        <option value="Sunguard">Sunguard️</option>
                     </select>
+                    <input type="submit" value="Change DM">
                 </form><br>                    
             </div>            
 
@@ -119,7 +121,7 @@
                     <iframe src="https://player.twitch.tv/?channel=thewyvernstale" frameborder="0" scrolling="no"></iframe>
                 </div>
                 <div class='twitchChat tc'>
-                    <iframe frameborder="0" scrolling="no" src="https://www.twitch.tv/embed/thewyvernstale/chat"></iframe>
+                    <iframe frameborder="0" scrolling="yes" id="DnDonations" src="https://www.twitch.tv/embed/thewyvernstale/chat"></iframe>
                 </div>
             </div>
 

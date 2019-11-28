@@ -48,10 +48,20 @@ body {
     display: grid;
     gap: 1em;
     grid-template-areas: 
-    "ti ti ti ti"
+    /* "ti ti ti ti"
     "dm dm dm gl"
     "qu qu qu qu"
-    "tw tw tw tw";
+    "tw tw tw tw"; */
+
+    "ti ti ti ti"
+    "tw tw tw tw"
+    "qu qu qu qu"
+    "dm dm dm gl";
+    
+    /* "dm dm dm gl"
+    "ti ti ti ti"
+    "tw tw tw tw"
+    "qu qu qu qu"; */
 }
 
 .ti {
@@ -127,6 +137,11 @@ body {
 .lis {
     font-family: "Press Start 2P";
     font-size: 1.15em;
+}
+
+.tip {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: .8em;
 }
 
 /* global */
