@@ -115,10 +115,10 @@
                 </div>
 
                 <div class="opsbuttons">
-                    <button ng-click="panel='addgold'">Add Gold</button>
-                    <button ng-click="panel='addchar'">Add Character</button>
-                    <button ng-click="panel='addboon'" ng-disabled="current_donor.available_gold < 5.0">Purchase Boon</button>
-                    <button ng-click="panel='addbane'" ng-disabled="current_donor.available_gold < 5.0">Purchase Bane</button>
+                    <a href="#gold"><button ng-click="panel='addgold'">Add Gold</button></a>
+                    <a href="#char"><button ng-click="panel='addchar'">Add Character</button></a>
+                    <a href="#boon"><button ng-click="panel='addboon'" ng-disabled="current_donor.available_gold < 5.0">Purchase Boon</button></a>
+                    <a href="#bane"><button ng-click="panel='addbane'" ng-disabled="current_donor.available_gold < 5.0">Purchase Bane</button></a>
                 </div>
 
                 <!-- This div's content is swapped out -->
@@ -126,7 +126,7 @@
                     <!-- add Gold panel-->
                         
                     <div ng-switch-when="addgold">
-                        <h3>Add Gold</h3><br>
+                        <h3 id="gold">Add Gold</h3><br>
                         <form ng-submit="addDonation()">
                             <label for="amount">Amount:</label><br>
                             <input type="text" name="amount" ng-model="nd.amount"><br>
@@ -143,7 +143,7 @@
                     <!-- add char -->
 
                     <div ng-switch-when="addchar">
-                        <h3>Add New Character</h3>
+                        <h3 id="char">Add New Character</h3>
                         <form novalidate ng-submit="createCharacter()">
                             <label for="charname">Character Name:</label><br>
                             <input type="text" name="charname" ng-model="character.name"><br>
@@ -186,7 +186,7 @@
 
                     <!-- buy boon -->
                     <div ng-switch-when="addboon">
-                        <h3>Purchase Boon</h3>
+                        <h3 id="boon">Purchase Boon</h3>
 
                         <form ng-submit="addPurchase('boon')">    
                         <ul>
@@ -220,7 +220,7 @@
                     <!-- buy bane -->
                     
                     <div ng-switch-when="addbane">
-                        <h3>Purchase Bane</h3>
+                        <h3 id="bane">Purchase Bane</h3>
 
                         <form ng-submit="addPurchase('bane')">    
                         <ul>

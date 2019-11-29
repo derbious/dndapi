@@ -62,6 +62,10 @@
 
 /* general styles */
 
+html {
+    scroll-behavior: smooth;
+}
+
 body {
     background-color: rgba(34, 31, 42, 0.966);
 }
