@@ -86,6 +86,25 @@ body {
     grid-area: tw;
 }
 
+@media only screen and (max-width: 800px) {
+    .grid-container {
+        grid-template-areas: 
+        "hd"
+        "li"
+        "mn";        
+    }
+
+    .mn {
+        grid-template-areas: 
+        "ti"
+        "dm"
+        "gl"
+        "qu"
+        "tw";
+    }
+}
+
+
 /* login modal */
 
 .logmodal {
