@@ -1,4 +1,5 @@
 import sqlite3
+import math
 from datetime import datetime
 from dndapi import app
 
@@ -413,9 +414,15 @@ def character_start(character_id, seat):
         WHERE id = ?""", [seat,datetime.now(), character_id])
         dbconn.commit()
 
-def character_res(character_id):
+def character_res(character_id, benefactor_id):
      with sqlite3.connect(DATABASE_LOCATION) as dbconn:
         c = dbconn.cursor()
+        # Calculate the cost of the new res
+        c.execute("""SELECT num_resses FROM characters WHERE id=?""",[character_id,])
+        numresses = c.fetchone()[0]
+        res_amount = pow(2,numresses)*500
+        c.execute("""INSERT INTO purchases(amount, timestamp, reason, donor_id) values(?,?,?,?)""", 
+                  [res_amount, datetime.now(), 'resurrection', benefactor_id])
         c.execute("""UPDATE characters SET
           num_resses = num_resses+1
         WHERE id = ?""", [character_id])

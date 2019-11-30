@@ -409,6 +409,26 @@ dndApp.controller('QueueController', ['$scope', '$http', '$interval', function($
     $scope.selected = [];
     $scope.resses = [];
 
+    $scope.benefactors = [];
+    $scope.benefactor_selected = [];
+
+    $scope.refreshBenefactors = function(){
+        var token = sessionStorage.getItem('access_token');
+        console.log('Refreshing all benefactors stuff');
+        $http({
+            method: 'GET',
+            url: "api/donors",
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': "JWT "+token
+            }
+        }).then(function successCallback(response) {
+            // Select only donors with at least 5g
+            $scope.benefactors = response.data.filter(d => d.available_gold >= 5.0);
+            console.log("All the benefactors:", $scope.benefactors);
+        });
+    };
+
     $scope.seatPlayer = function(s){
         seat = s+1; // provided seat is indexed from 0
         console.log("seating player in seat ", seat);
@@ -437,6 +457,12 @@ dndApp.controller('QueueController', ['$scope', '$http', '$interval', function($
         console.log("Ressing player: ", seat);
         var token = sessionStorage.getItem('access_token');
         character_id = $scope.queue.playing[s].id;
+        console.log('benefactor_selected[]:', $scope.benefactor_selected);
+        // Post a purchase for the res
+        var resdata = {
+            "character_id": character_id,
+            "benefactor_id": Number($scope.benefactor_selected[s])
+        }
         $http({
             method: 'POST',
             url: "api/characters/res/"+character_id,
@@ -444,7 +470,7 @@ dndApp.controller('QueueController', ['$scope', '$http', '$interval', function($
                 'Content-Type': 'application/json',
                 'Authorization': "JWT "+token
             },
-            data: {}  // nothing to post here
+            data: resdata
         }).then(function successCallback(response) {
             console.log('Successful call to /api/characters/res [POST]');
             $scope.refreshQueue();
@@ -490,6 +516,7 @@ dndApp.controller('QueueController', ['$scope', '$http', '$interval', function($
         });
     };
     $interval($scope.refreshQueue, 10000);
+    $interval($scope.refreshBenefactors, 10000);
     
 }]);
 

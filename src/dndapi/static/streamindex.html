@@ -107,6 +107,9 @@
                             <td ng-show="queue.playing[$index] !== null">{{ queue.playing[$index].class }}</td>
                             <td ng-show="queue.playing[$index] !== null">Times Rezzed: <span class="defont">{{ queue.playing[$index].num_resses}}</span></td>
                             <td ng-show="queue.playing[$index] !== null">
+                                <select class="select-css" name="benefactor" ng-model="benefactor_selected[$index]">
+                                    <option ng-repeat="benefactor in benefactors" value="{{benefactor.id}}" ng-if="benefactor.available_gold >= 5">{{benefactor.first_name}} {{benefactor.last_name}} ({{benefactor.available_gold}})</option>
+                                </select>
                                 <button ng-click="resPlayer($index);">Rez (${{ Math.pow(2,Number(queue.playing[$index].num_resses))*5 }})</button>
                                 <button ng-click="killPlayer($index);">Kill</button>
                             </td>

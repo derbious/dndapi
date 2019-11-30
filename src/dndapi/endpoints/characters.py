@@ -27,6 +27,18 @@ NEWCHAR_SCHEMA = {
     }
 }
 
+RES_SCHEMA = {
+    "type": "object",
+    "required": [
+        "character_id",
+        "benefactor_id"
+    ],
+    "properties": {
+        "character_id": {"type" : "integer"},
+        "benefactor_id": {"type" : "integer"}
+    }
+}
+
 def to_json(char):
     jso = {
         'id': char['id'],
@@ -160,6 +172,14 @@ def characterres(character_id=None):
     if character_id == None:
         return '',400
     else:
-        database.character_res(character_id)
-        return "{\"status\": \"ok\"}",201
+        try:
+            json_data = request.get_json()
+            validate(json_data, RES_SCHEMA)
+            database.character_res(json_data['character_id'], json_data['benefactor_id'])
+            return "{\"status\": \"ok\"}",201
+        except Exception as e:
+            app.logger.info('ressurect post failed validation')
+            app.logger.info(e)
+            return '', 400
+
 
