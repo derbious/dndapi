@@ -46,7 +46,7 @@
                         <td>{{ d.first_name }}</td>
                         <td>{{ d.last_name }}</td>
                         <td>{{ d.email_address }}</td>
-                        <td style="background-color: #8286A0;"><button>Select</button></td>
+                        <td style="background-color: #8286A0;"><a href="#doninfo"><button>Select</button></a></td>
                     </tr>
                 </table>
             </div>
@@ -55,7 +55,7 @@
             <div id="results" ng-show="current_donor != null">
                 
                 <div class="doninfobox">
-                    <h3>Donor Information</h3>
+                    <h3 id="doninfo">Donor Information</h3>
 
                     <table class="dondeets">
                         <tr>
