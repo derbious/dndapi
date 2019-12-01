@@ -51,7 +51,7 @@ def get_player(seatnum):
             hours, remainder = divmod(lifetime, 3600)
             minutes, seconds = divmod(remainder, 60)
             time = '{:02}:{:02}'.format(int(hours), int(minutes))
-    html = f'<div class="gb">{name}</div><div class="gb" style="font-size: 18px;">{clas}</div><div class="p2">{time}</div>'
+    html = f'<div class="gb" style="font-size: 18px; color:#461B7E">{name}</div><div class="gb" style="font-size: 18px; color:#2C3539;">{clas}</div><div class="p2" style="color:#2C3539;">{time}</div>'
     return html, 200
 
 @app.route('/api/streaminfo/teamkills/<team>', methods=['GET'])
@@ -69,7 +69,7 @@ def get_teaminfo(team):
 def get_peril():
     queued = database.select_queue('queued')
     peril_lvl = min(max(len(queued), 1), 5)
-    html = f'<span class="p2">{peril_lvl}</span>'
+    html = f'<span class="p2" style="color:#461B7E; font-size: 35px;">{peril_lvl}</span>'
     return html, 200
 
 @app.route('/api/streaminfo/graveyard', methods=['GET'])
@@ -91,14 +91,14 @@ def get_totalkills():
     for team in ['sunguard', 'duskpatrol', 'moonwatch']:
         if team in tks:
             totalkills += tks[team]
-    html = f'<span class="p2">{totalkills}</span>'
+    html = f'<span class="p2" style="color:#461B7E; font-size: 35px;>{totalkills}</span>'
     return html, 200
 
 @app.route('/api/streaminfo/nextgoal', methods=['GET'])
 def get_nextgoal():
     ms = database.get_meta('nextgoal')
     if ms:
-        html = f'<span class="p2">{ms["value"]}</span>'
+        html = f'<span class="p2" style="color:#461B7E; font-size: 35px;>{ms["value"]}</span>'
         return html, 200
     else:
         return '', 404
