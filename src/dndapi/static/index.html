@@ -145,8 +145,8 @@
                     <div ng-switch-when="addchar">
                         <h3 id="char">Add New Character</h3>
                         <form novalidate ng-submit="createCharacter()">
-                            <label for="charname">Character Name:</label><br>
-                            <input type="text" name="charname" ng-model="character.name"><br>
+                            <label for="charname">Character Name: (8 letters max)</label><br>
+                            <input type="text" name="charname" ng-model="character.name" maxlength="8"><br>
                             <label for="charrace">Race:</label>
                             <select class="select-css" name="charrace" ng-model="character.race">
                                 <option selected>Dragonborn</option>

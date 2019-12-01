@@ -9,14 +9,24 @@ from flask import render_template
 def render_streaminfo(path=None):
     return render_template('streaminfo.html', content_url="/api/streaminfo/"+path)
 
-@app.route('/api/streaminfo/dm', methods=['GET',])
-def get_dm():
+@app.route('/api/streaminfo/dmname', methods=['GET',])
+def get_dmname():
     dm = database.get_current_dm()
     if dm:
-        html = f'<div class="gb">{dm["name"]}</div><span class="p2">{dm["numkills"]} KILLS</span>'
+        html = f'<span class="gb">{dm["name"]}</span>'
         return html, 200
     else:
         return '', 404
+
+@app.route('/api/streaminfo/dmkills', methods=['GET',])
+def get_dmkills():
+    dm = database.get_current_dm()
+    if dm:
+        html = f'<span class="p2">{dm["numkills"]}</span>'
+        return html, 200
+    else:
+        return '', 404
+
 
 @app.route('/api/streaminfo/ticker', methods=['GET',])
 def get_ticker():
@@ -41,30 +51,31 @@ def get_player(seatnum):
             hours, remainder = divmod(lifetime, 3600)
             minutes, seconds = divmod(remainder, 60)
             time = '{:02}:{:02}'.format(int(hours), int(minutes))
-    html = f'<div class="gb">{name}</div><div class="gb">{clas}</div><div class="p2">{time}</div>'
+    html = f'<div class="gb">{name}</div><div class="gb" style="font-size: 18px;">{clas}</div><div class="p2">{time}</div>'
     return html, 200
 
-@app.route('/api/streaminfo/teaminfo', methods=['GET'])
-def get_teaminfo():
+@app.route('/api/streaminfo/teamkills/<team>', methods=['GET'])
+def get_teaminfo(team):
     tks = database.select_dm_teamkills()
+    app.logger.info(tks)
     ## Fill in zero kills for losers
-    for team in ['dawnguard', 'duskpatrol', 'nightwatch']:
-        if team not in tks:
-            tks[team] = 0
-    html = f'<div class="gb">Duskpatrol: {tks["duskpatrol"]}</div><div class="gb">Nightwatch: {tks["nightwatch"]}</div><div class="gb">Dawnguard: {tks["dawnguard"]}</div>'
-    return html, 200
+    kills = 0
+    if team in tks:
+        kills = tks[team]
+    html = f'<span class="gb">{kills}</span>'
+    return html,200
 
 @app.route('/api/streaminfo/peril', methods=['GET'])
 def get_peril():
     queued = database.select_queue('queued')
     peril_lvl = min(max(len(queued), 1), 5)
-    html = f'<div class="p2">PERIL LEVEL:</div><div class="p2">{peril_lvl}</div>'
+    html = f'<span class="p2">{peril_lvl}</span>'
     return html, 200
 
 @app.route('/api/streaminfo/graveyard', methods=['GET'])
 def get_graveyard():
     dead_chars = database.select_queue('dead')
-    html = '<table style="width: 20em;">'
+    html = '<table style="width: 24em;">'
     for dc in dead_chars:
         lifetime = (datetime.fromisoformat(dc['end_time']) - datetime.fromisoformat(dc['start_time'])).seconds
         hours, remainder = divmod(lifetime, 3600)
@@ -77,17 +88,17 @@ def get_graveyard():
 def get_totalkills():
     totalkills = 0
     tks = database.select_dm_teamkills()
-    for team in ['dawnguard', 'duskpatrol', 'nightwatch']:
+    for team in ['sunguard', 'duskpatrol', 'moonwatch']:
         if team in tks:
             totalkills += tks[team]
-    html = f'<div class="p2">TOTAL KILLS:</div><div class="p2">{totalkills}</div>'
+    html = f'<span class="p2">{totalkills}</span>'
     return html, 200
 
 @app.route('/api/streaminfo/nextgoal', methods=['GET'])
 def get_nextgoal():
     ms = database.get_meta('nextgoal')
     if ms:
-        html = f'<div class="p2">NEXT MILESTONE:</div><div class="p2">{ms["value"]}</div>'
+        html = f'<span class="p2">{ms["value"]}</span>'
         return html, 200
     else:
         return '', 404
