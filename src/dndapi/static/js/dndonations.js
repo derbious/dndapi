@@ -515,6 +515,7 @@ dndApp.controller('QueueController', ['$scope', '$http', '$interval', function($
             $scope.queue_error = "Could not fetch queue";
         });
     };
+
     $interval($scope.refreshQueue, 10000);
     $interval($scope.refreshBenefactors, 10000);
     

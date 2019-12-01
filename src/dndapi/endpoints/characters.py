@@ -182,4 +182,3 @@ def characterres(character_id=None):
             app.logger.info(e)
             return '', 400
 
-
