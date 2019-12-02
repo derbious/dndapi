@@ -51,7 +51,7 @@ def get_player(seatnum):
             hours, remainder = divmod(lifetime, 3600)
             minutes, seconds = divmod(remainder, 60)
             time = '{:02}:{:02}'.format(int(hours), int(minutes))
-    html = f'<div style="background-color: #9D9A87; padding:20px;"><div class="gb" style="font-size: 18px; color:#461B7E">{name}</div><div class="gb" style="font-size: 18px; color:#2C3539;">{clas}</div><div class="p2" style="color:#2C3539;">{time}</div></div>'
+    html = f'<div style="background-color: #9D9A87; padding:20px;"><div class="gb" align="center" style="font-size: 18px; color:#461B7E">{name}</div><div align="center" class="gb" style="font-size: 18px; color:#2C3539;">{clas}</div><div align="center" class="p2" style="color:#2C3539;">{time}</div></div>'
     return html, 200
 
 @app.route('/api/streaminfo/teamkills/<team>', methods=['GET'])
