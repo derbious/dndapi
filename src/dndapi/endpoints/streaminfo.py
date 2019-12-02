@@ -39,9 +39,9 @@ def get_ticker():
 
 @app.route('/api/streaminfo/player/<int:seatnum>', methods=['GET'])
 def get_player(seatnum):
-    name = ""
-    clas = ""
-    time = ""
+    name = "&nbsp;"
+    clas = "&nbsp;"
+    time = "&nbsp;"
     playing = database.select_queue('playing')
     for p in playing:
         if p['q_pos'] == seatnum:
@@ -51,7 +51,7 @@ def get_player(seatnum):
             hours, remainder = divmod(lifetime, 3600)
             minutes, seconds = divmod(remainder, 60)
             time = '{:02}:{:02}'.format(int(hours), int(minutes))
-    html = f'<div style="background-color: #FFF8DC; padding:20px;"><div class="gb" style="font-size: 18px; color:#461B7E">{name}</div><div class="gb" style="font-size: 18px; color:#2C3539;">{clas}</div><div class="p2" style="color:#2C3539;">{time}</div></div>'
+    html = f'<div style="background-color: #9D9A87; padding:20px;"><div class="gb" style="font-size: 18px; color:#461B7E">{name}</div><div class="gb" style="font-size: 18px; color:#2C3539;">{clas}</div><div class="p2" style="color:#2C3539;">{time}</div></div>'
     return html, 200
 
 @app.route('/api/streaminfo/teamkills/<team>', methods=['GET'])
@@ -69,7 +69,7 @@ def get_teaminfo(team):
 def get_peril():
     queued = database.select_queue('queued')
     peril_lvl = min(max(len(queued), 1), 5)
-    html = f'<div class="p2" style="padding:20px; background-color: #FFF8DC; color:#461B7E; font-size: 35px;">{peril_lvl}</div>'
+    html = f'<div class="p2" style="padding:20px; background-color: #9D9A87; color:#461B7E; font-size: 35px;">{peril_lvl}</div>'
     return html, 200
 
 @app.route('/api/streaminfo/graveyard', methods=['GET'])
@@ -91,14 +91,14 @@ def get_totalkills():
     for team in ['sunguard', 'duskpatrol', 'moonwatch']:
         if team in tks:
             totalkills += tks[team]
-    html = f'<div class="p2" style="padding:20px; background-color:#FFF8DC; color:#461B7E; font-size: 35px;">{totalkills}</div>'
+    html = f'<div class="p2" style="padding:20px; background-color:#9D9A87; color:#461B7E; font-size: 35px;">{totalkills}</div>'
     return html, 200
 
 @app.route('/api/streaminfo/nextgoal', methods=['GET'])
 def get_nextgoal():
     ms = database.get_meta('nextgoal')
     if ms:
-        html = f'<div class="p2" style="padding:20px; background-color:#FFF8DC; color:#461B7E; font-size: 35px;">{ms["value"]}</div>'
+        html = f'<div class="p2" style="padding:20px; background-color:#9D9A87; color:#461B7E; font-size: 20px;">{ms["value"]}</div>'
         return html, 200
     else:
         return '', 404
