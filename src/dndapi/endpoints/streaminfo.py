@@ -51,7 +51,7 @@ def get_player(seatnum):
             hours, remainder = divmod(lifetime, 3600)
             minutes, seconds = divmod(remainder, 60)
             time = '{:02}:{:02}'.format(int(hours), int(minutes))
-    html = f'<div class="gb" style="font-size: 18px; color:#461B7E">{name}</div><div class="gb" style="font-size: 18px; color:#2C3539;">{clas}</div><div class="p2" style="color:#2C3539;">{time}</div>'
+    html = f'<div style="background-color: #FFF8DC; padding:20px;"><div class="gb" style="font-size: 18px; color:#461B7E">{name}</div><div class="gb" style="font-size: 18px; color:#2C3539;">{clas}</div><div class="p2" style="color:#2C3539;">{time}</div></div>'
     return html, 200
 
 @app.route('/api/streaminfo/teamkills/<team>', methods=['GET'])
@@ -62,14 +62,14 @@ def get_teaminfo(team):
     kills = 0
     if team in tks:
         kills = tks[team]
-    html = f'<span class="gb">{kills}</span>'
+    html = f'<div class="gb">{kills}</div>'
     return html,200
 
 @app.route('/api/streaminfo/peril', methods=['GET'])
 def get_peril():
     queued = database.select_queue('queued')
     peril_lvl = min(max(len(queued), 1), 5)
-    html = f'<span class="p2" style="color:#461B7E; font-size: 35px;">{peril_lvl}</span>'
+    html = f'<div class="p2" style="padding:20px; background-color: #FFF8DC; color:#461B7E; font-size: 35px;">{peril_lvl}</div>'
     return html, 200
 
 @app.route('/api/streaminfo/graveyard', methods=['GET'])
@@ -91,14 +91,14 @@ def get_totalkills():
     for team in ['sunguard', 'duskpatrol', 'moonwatch']:
         if team in tks:
             totalkills += tks[team]
-    html = f'<span class="p2" style="color:#461B7E; font-size: 35px;>{totalkills}</span>'
+    html = f'<div class="p2" style="padding:20px; background-color:#FFF8DC; color:#461B7E; font-size: 35px;">{totalkills}</div>'
     return html, 200
 
 @app.route('/api/streaminfo/nextgoal', methods=['GET'])
 def get_nextgoal():
     ms = database.get_meta('nextgoal')
     if ms:
-        html = f'<span class="p2" style="color:#461B7E; font-size: 35px;>{ms["value"]}</span>'
+        html = f'<div class="p2" style="padding:20px; background-color:#FFF8DC; color:#461B7E; font-size: 35px;">{ms["value"]}</div>'
         return html, 200
     else:
         return '', 404
