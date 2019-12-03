@@ -330,7 +330,7 @@ dndApp.controller('StreamController', ['$scope', '$http', '$interval', function(
         var token = sessionStorage.getItem('access_token');
         console.log("in setNextgoal", $scope.nextgoal);
         goal = {
-            "key": "goal",
+            "key": "nextgoal",
             "value": $scope.nextgoal
         }
         $http({
@@ -382,13 +382,13 @@ dndApp.controller('StreamController', ['$scope', '$http', '$interval', function(
 
         $http({
             method: 'GET',
-            url: "api/meta/goal",
+            url: "api/meta/nextgoal",
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': "JWT "+token
             }
         }).then(function successCallback(response) {
-            console.log('Successful call to /api/meta/goal [GET]');
+            console.log('Successful call to /api/meta/nextgoal [GET]');
             $scope.current_nextgoal = response.data.value;
         }, function errorCallback(response) {
             $scope.queue_error = "Could not fetch goal";
