@@ -7,7 +7,12 @@ from flask import render_template
 
 @app.route('/streaminfo/<path:path>')
 def render_streaminfo(path=None):
-    return render_template('streaminfo.html', content_url="/api/streaminfo/"+path)
+    refresh_interval = 5000
+    if path in ['graveyard']:
+        refresh_interval = 120000
+    return render_template('streaminfo.html',
+            content_url="/api/streaminfo/"+path,
+            refresh_interval=refresh_interval)
 
 @app.route('/api/streaminfo/dmname', methods=['GET',])
 def get_dmname():
@@ -58,11 +63,20 @@ def get_player(seatnum):
 def get_teaminfo(team):
     tks = database.select_dm_teamkills()
     app.logger.info(tks)
+    colors = {
+        'duskpatrol': '#D08E8C',
+        'moonwatch': '#60606F',
+        'sunguard': '#C67644'
+    }
     ## Fill in zero kills for losers
     kills = 0
     if team in tks:
         kills = tks[team]
-    html = f'<div class="gb">{kills}</div>'
+    if team in colors:
+        color = colors[team]
+    else:
+        color = '#FFFFFF'
+    html = f'<div class="gb" style="color:{color};">{kills}</div>'
     return html,200
 
 @app.route('/api/streaminfo/peril', methods=['GET'])
@@ -75,13 +89,13 @@ def get_peril():
 @app.route('/api/streaminfo/graveyard', methods=['GET'])
 def get_graveyard():
     dead_chars = database.select_queue('dead')
-    html = '<table style="width: 24em;">'
+    html = '<marquee behavior="scroll" direction="up" scrollamount="2" style="height:600px;"><table style="width: 24em;">'
     for dc in dead_chars:
         lifetime = (datetime.fromisoformat(dc['end_time']) - datetime.fromisoformat(dc['start_time'])).seconds
         hours, remainder = divmod(lifetime, 3600)
         minutes, seconds = divmod(remainder, 60)
         html += '<tr style="vertical-align: bottom;"><td class="gb">{}<td><td class="p2" style="font-size: 20px">{:02}:{:02}</td><tr>'.format(dc['name'], int(hours), int(minutes))
-    html += '</table>'
+    html += '</table></marquee>'
     return html, 200
 
 @app.route('/api/streaminfo/totalkills', methods=['GET'])
